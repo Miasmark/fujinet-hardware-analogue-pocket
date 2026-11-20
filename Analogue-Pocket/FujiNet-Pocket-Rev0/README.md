@@ -200,6 +200,24 @@ as `include/pinmap/pocket.h` and `build-platforms/platformio-fujinet-pocket.ini`
     shell);
   - the renders in `docs/`.
 
+## Measure with the breakout cart
+
+These numbers are estimates in the board and shell; each is one setting in `tools/gen_pcb.py`
+(and `tools/placement.py` for the slot line), then `LAYOUT=1 tools/build_all.sh` re-runs the
+layout and the shell anchors.
+
+| # | Measure | Now (estimate) | Setting |
+|---|---|---|---|
+| 1 | **Voltage switch:** how far above the tab base the left corner must stay at the tab's width | 10 mm | `NOTCH_H` |
+| 2 | **Seated depth:** how far from the insertion edge the board's back starts lying against the Pocket | 31 mm (y = 119) | `SLOT_Y` (gen_pcb.py and placement.py) |
+| 3 | **Lip:** how far up the component side the Pocket's lip covers (low parts only below) | 15 mm (y = 135) | `LIP_Y` (gen_pcb.py and placement.py) |
+| 4 | **Board thickness** the slot wants | 1.0 mm (Gekkio's GB boards) | `THICKNESS` |
+| 5 | **Pin 1 side:** VCC (pin 1) on the left, seen from the contact side with the fingers down | as Gekkio's footprint | `make_edge_fp.py` |
+
+**Final pass, after the measurements and the re-route:** clear the DRC warnings left then.
+Today these are 2 dangling stitching vias and 2 silkscreen texts near the edge. Re-check the
+renders and the shell anchors, and fit a printed blank.
+
 ## Before ordering boards
 
 1. **Edge:** check the finger face, pin 1 and the board thickness (1.0 mm, as Gekkio's GB
