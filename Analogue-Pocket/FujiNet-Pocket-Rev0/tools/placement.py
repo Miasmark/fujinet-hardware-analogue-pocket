@@ -3,27 +3,31 @@ the component side (F.Cu), y down, rotation CCW; mm.
 
 Board (gen_pcb.py): body x 74.3..125.7 from the top edge Y0 = 68 down to the tab base 141.4; the
 49.2 mm tab below with the 32 fingers; insertion edge y = 150.  The Pocket's shell top sits about
-SLOT_Y = 119 (31 mm in from the insertion edge, ESTIMATE -- measure a Pocket): below that line the
-board is inside the slot, where only the low parts go.
+SLOT_Y = 119 (31 mm in from the insertion edge, ESTIMATE -- measure a Pocket).  Below that line the
+board's flat back lies nearly flush against the Pocket in its cartridge recess, and the component
+side (the fingers' side) faces the recess's open side, covered only by the Pocket's lip below about
+LIP_Y = 135 (15 mm in, ESTIMATE): there only low parts go.
 
 Fingers (x = 100 + make_edge_fp.pin_x): pin 1 CART_VCC 76.6, pin 5 POCKET_TX 82.75, pin 31
 POCKET_RX 121.75, pin 32 GND 123.4.
 
 Regions:
   inside the slot   the RX chain over pin 5 (west), the TX chain over pin 31 (east), the bring-up
-                    pads between them, two shell holes
+                    pads between them, the battery's lead pads, two shell holes
   upper body        the ESP32-S3 top centre, antenna flush with the top edge over its keep-out band
                     (no copper, holes or parts across the whole width there); the reset / boot
                     buttons and the S3's decoupling west of it, the three LEDs down the west edge;
                     the microSD on the east edge (card in from the east); USB-C on the west edge
                     (plug in from the west); under the module, west to east: ESD and CC, the charger
                     and power path, the TPS63001 and its inductor, the CP2102N and auto-program
-  back (B side)     the LiPo landing pad over most of the upper body, its lead pads at its west end
-                    by the charger; no other part on the back
+  the cell          rides on a shelf in the shell over the parts (gen_pcb.CELL), clear of the
+                    antenna band and the buttons; its leads come down to J_BAT above the lip
+  back (B side)     nothing: it lies against the Pocket
 The shell's M2 holes (gen_pcb.HOLES) keep 3 mm rings clear of parts.
 """
 
 SLOT_Y = 119.0
+LIP_Y = 135.0
 
 
 def do_placement(place, fiducials):
@@ -101,17 +105,17 @@ def do_placement(place, fiducials):
 
     # ---- the CP2102N and auto-program -------------------------------------------------
     place('U_UART', 111.0, 108.5, 0)
-    place('C_UART', 109.6, 103.4, 0)
-    place('C_UARTBULK', 113.0, 103.4, 0)
+    place('C_UART', 106.6, 111.8, 90)        # by VDD / VREGIN (pins 6, 7), clear of the USB pins (4, 5) and the north pins
+    place('C_UARTBULK', 114.9, 111.0, 90)
     place('R_CPRST', 115.6, 103.8, 90)
-    place('R_VBSH', 106.4, 112.6, 90)
-    place('R_VBSL', 104.2, 112.6, 90)
+    place('R_VBSH', 104.2, 112.6, 90)
+    place('R_VBSL', 102.0, 112.6, 90)
     place('U_AUTOPROG', 111.0, 114.6, 0)
 
-    # ---- the cell, on the back --------------------------------------------------------
-    # rotated 180: the cell spans x 84.6..125.6, y 79.5..110.5 (silk); its lead pads at x 82.5
-    # (pad 1 + at y 98, pad 2 - at y 92), by the charger
-    place('J_BAT', 105.1, 95.0, 180)
+    # ---- the cell's leads -------------------------------------------------------------
+    # the cell rides on the shell's shelf over the parts (gen_pcb.CELL: x 88..118, y 79..129); its
+    # leads come down from its lower end to these pads, above the lip (pad 1 + at x 103, - at x 97)
+    place('J_BAT', 100.0, 131.5, 0)
 
     # ---- the edge -------------------------------------------------------------------
     place('J_EDGE', 100.0, 146.0, 0)        # insertion edge at local y +4.0 -> board y 150

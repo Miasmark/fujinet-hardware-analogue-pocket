@@ -4,13 +4,16 @@
 Board (KiCad frame, mm, y down): the Game Boy / GBA cartridge tab of the Pocket's slot (x 75.4..
 124.6, y 141.4..150, y = 150 the insertion edge; make_edge_fp.py has the geometry, from Gekkio's
 GB-CART32K-A) under a 51.4 mm wide body (x 74.3..125.7) that runs up to the top edge Y0.  The
-Pocket's shell top is about SLOT_Y = 119 (ESTIMATE): below it the board is inside the slot (low
-parts only), above it stand the module, the connectors and, on the back, the cell.  1.0 mm, 4
+Pocket's shell top is about SLOT_Y = 119 (ESTIMATE): below it the board's flat back lies nearly
+flush against the Pocket in its cartridge recess, and the component side (the fingers' side) faces
+the recess's open side, covered only by the Pocket's lip below about LIP_Y = 135 (ESTIMATE).  The
+cell rides over the components on a shelf in the shell (CELL, SHELF_Z), its leads down to two
+pads on the component side.  1.0 mm, 4
 copper layers:
   F.Cu   signals + GND pour     (every part; the fingers)
   In1    GND plane
   In2    +3V3 plane
-  B.Cu   signals + GND pour     (the LiPo landing pad and its two lead pads; no parts)
+  B.Cu   signals + GND pour     (no parts: it lies against the Pocket)
 The ESP32-S3 antenna sits flush with the top edge over the module footprint's own keep-out band
 (no copper, holes or parts on any layer, across the board).  Six M2 holes (HOLES) for the shell,
 clear of parts by HOLE_KEEP; case/board-anchors.scad and case/board-anchors.json carry them, the
@@ -45,23 +48,33 @@ TAB_Y = EDGE_FP_Y + EG.TAB_TOP  # 141.4: tab base = bottom of the body
 Y0 = 68.0                       # top edge: the antenna
 PAD_TOP_Y = EDGE_FP_Y - 3.0     # finger copper starts here
 THICKNESS = 1.0
-SLOT_Y = 119.0                  # the Pocket's shell top, ESTIMATE (placement.py)
+SLOT_Y = 119.0                  # the Pocket's shell top, ESTIMATE (placement.py): the back is flush below
+LIP_Y = 135.0                   # the Pocket's lip over the component side, ESTIMATE: low parts below
 CH_TOP, CH_SH, CH_TAB = 2.0, 0.6, EG.R_CORNER      # chamfers: top corners, tab shoulders, insertion corners
+# the voltage-switch notch: the body's lower-left corner (pin 1's side, seen from the component side
+# with the fingers down) cut back above the tab, so the shell's GBA-shaped corner there can be cut
+# deep and wide enough never to touch the Pocket's voltage switch.  ESTIMATE -- measure the switch
+# on a Pocket; the tab (pin 1 is the first finger) is not cut.
+NOTCH_W, NOTCH_H = 3.5, 10.0
+NOTCH = (X0, TAB_Y - NOTCH_H, X0 + NOTCH_W, TAB_Y)
 OUTLINE = [(X0 + CH_TOP, Y0), (X1 - CH_TOP, Y0), (X1, Y0 + CH_TOP),
            (X1, TAB_Y - CH_SH), (X1 - CH_SH, TAB_Y), (TAB_X1, TAB_Y),
            (TAB_X1, Y1 - CH_TAB), (TAB_X1 - CH_TAB, Y1), (TAB_X0 + CH_TAB, Y1), (TAB_X0, Y1 - CH_TAB),
-           (TAB_X0, TAB_Y), (X0 + CH_SH, TAB_Y), (X0, TAB_Y - CH_SH), (X0, Y0 + CH_TOP)]
-BODY = [(X0, Y0), (X1, Y0), (X1, TAB_Y), (X0, TAB_Y)]   # planes / pours (clipped by the outline)
+           (TAB_X0, TAB_Y), (NOTCH[2], TAB_Y), (NOTCH[2], NOTCH[1]), (X0, NOTCH[1]), (X0, Y0 + CH_TOP)]
+BODY = [(X0, Y0), (X1, Y0), (X1, TAB_Y), (NOTCH[2], TAB_Y), (NOTCH[2], NOTCH[1]), (X0, NOTCH[1])]   # planes / pours
 # M2 holes for the shell (x, y, diameter): two by the top corners below the antenna band, two
 # just above the slot line, two inside the slot; parts keep HOLE_KEEP from each centre
 HOLES = [(77.5, 76.5, 2.2), (122.5, 76.5, 2.2), (77.5, 116.0, 2.2), (122.5, 116.0, 2.2),
-         (78.0, 130.0, 2.2), (122.0, 130.0, 2.2)]
+         (81.0, 127.5, 2.2), (119.0, 127.5, 2.2)]   # the last two clear of the switch notch
 HOLE_KEEP = 3.0
 # parts allowed past the body edge (their mouths at the board edge)
 AT_EDGE = ('J_USB', 'J_SD')
-# the cell on the back (silk outline; placement.py puts J_BAT's origin at its centre)
-CELL = (84.6, 79.5, 125.6, 110.5)
-CELL_T = 5.0                    # thickest cell the landing pad is drawn for (503040)
+# the cell, on the shell's shelf over the component side: x0, y0, x1, y1 (30 x 50, clear of the
+# antenna band and the two buttons), the shelf's top face above the board (the tallest parts under
+# it, the module and the USB-C, are 3.1-3.2 mm: 0.4 mm clearance and a 0.8 mm shelf), its thickness
+CELL = (88.0, 79.0, 118.0, 129.0)
+SHELF_Z = 4.4
+CELL_T = 5.0                    # thickest cell the shelf is drawn for (503050)
 
 # ref -> (x, y, rotation deg CCW)  -- top view, y down
 PLACE = {}
@@ -478,24 +491,9 @@ def add_fanout(board):
         board.append(via(x, y, n, ('regv', i)))
     served = {id(p) for p in pads for (x0, y0, x1, y1, n, w) in pre
               if p.net == n and (p.dist(x0, y0) < 1e-6 or p.dist(x1, y1) < 1e-6)}
-    keep = [crt[K[k]] for k in ('U_S3', 'J_USB', 'SW_S3EN', 'SW_S3BOOT') if K[k] in crt]
-    sx, sy, _ = PLACE[K['U_S3']]                       # the antenna keep-out band
-    keep.append((X0, Y0 - 1.0, X1, sy - 6.75 + 0.3))
-    holes = [(x, y, d / 2 + 0.5) for x, y, d in HOLES]
-    vias, segs, failed = fanout.plan(pads, keep, (X0, Y0, X1, TAB_Y), TAB_Y, holes,
-                                     skip_refs=(K['J_EDGE'], K['J_BAT']), extra_segs=pre, extra_vias=pre_v,
-                                     skip_pads=served)
-    for i, (x, y, n) in enumerate(vias):
-        board.append(via(x, y, n, ('fv', i), fanout.VIA_D, fanout.VIA_DRILL))
-    for i, (x0, y0, x1, y1, n, w) in enumerate(segs):
-        board.append(seg(x0, y0, x1, y1, round(w, 3), 'F.Cu', n, ('fs', i)))
-    # the cell's - pad: a B.Cu stub east under the cell, a via into In1
-    g = [p for p in pads if p.ref == K['J_BAT'] and p.net == 'GND'][0]
-    vx = g.cx + g.hw + 1.2
-    board.append(seg(g.cx, g.cy, vx, g.cy, 0.6, 'B.Cu', 'GND', ('bat', 'gnd')))
-    for k, dy in enumerate((-0.6, 0.6)):
-        board.append(via(vx, g.cy + dy, 'GND', ('bat', 'gv', k), 0.8, 0.4))
-    board.append(seg(vx, g.cy - 0.6, vx, g.cy + 0.6, 0.6, 'B.Cu', 'GND', ('bat', 'gs')))
+    # the hand routes (USB-C pair, UART0 escapes, the GND finger) go down before the fan-out and are
+    # handed to it as existing copper, so its plane vias and stubs keep clear of them
+    early = []
     # USB-C D+ / D-: the two rows interleave (B7 DM, A6 DP, A7 DM, B6 DP at local x -0.75 .. +0.75,
     # pads ending at local y -4.77, inward = -y).  DP joins on F.Cu in a loop inward of the pads;
     # DM drops through two 0.45 / 0.2 mm vias and joins on B.Cu across under the loop.
@@ -506,28 +504,79 @@ def add_fanout(board):
     dp, dm, ye, w = NET('UBRG_DP'), NET('UBRG_DM'), -4.77, 0.2
     pts = [U(-0.25, ye + 0.3), U(-0.25, -5.7), U(0.75, -5.7), U(0.75, ye + 0.3)]
     for i, (p0, p1) in enumerate(zip(pts, pts[1:])):
-        board.append(seg(*p0, *p1, w, 'F.Cu', dp, ('usb', 'dp', i)))
+        early.append(seg(*p0, *p1, w, 'F.Cu', dp, ('usb', 'dp', i)))
     for k, lx in enumerate((-0.75, 0.25)):
-        board.append(seg(*U(lx, ye + 0.3), *U(lx, -5.1), w, 'F.Cu', dm, ('usb', 'dm', k)))
-        board.append(via(*U(lx, -5.1), dm, ('usb', 'dmv', k), 0.45, 0.2))
-    board.append(seg(*U(-0.75, -5.1), *U(0.25, -5.1), w, 'B.Cu', dm, ('usb', 'dmb')))
+        early.append(seg(*U(lx, ye + 0.3), *U(lx, -5.1), w, 'F.Cu', dm, ('usb', 'dm', k)))
+        early.append(via(*U(lx, -5.1), dm, ('usb', 'dmv', k), 0.45, 0.2))
+    early.append(seg(*U(-0.75, -5.1), *U(0.25, -5.1), w, 'B.Cu', dm, ('usb', 'dmb')))
+    # on to the ESD diodes, so the routers start past the crossover: DP from the loop's north
+    # corner on F.Cu to D_ESDP's pad; DM on B.Cu past the loop, up through a via by D_ESDM's pad
+    ep = [p for p in pads if p.ref == K['D_ESDP'] and p.net == dp][0]
+    em = [p for p in pads if p.ref == K['D_ESDM'] and p.net == dm][0]
+    a0 = U(-0.25, -5.7)
+    early.append(seg(*a0, ep.cx - 1.15, ep.cy, w, 'F.Cu', dp, ('usb', 'dpe', 0)))
+    early.append(seg(ep.cx - 1.15, ep.cy, ep.cx, ep.cy, w, 'F.Cu', dp, ('usb', 'dpe', 1)))
+    m0, mv = U(0.25, -5.1), (round(em.cx - 1.0, 4), round(em.cy, 4))
+    early.append(seg(*m0, mv[0] - (em.cy - m0[1]), em.cy, w, 'B.Cu', dm, ('usb', 'dme', 0)))
+    early.append(seg(mv[0] - (em.cy - m0[1]), em.cy, *mv, w, 'B.Cu', dm, ('usb', 'dme', 1)))
+    early.append(via(*mv, dm, ('usb', 'dmev'), 0.45, 0.2))
+    early.append(seg(*mv, em.cx, em.cy, w, 'F.Cu', dm, ('usb', 'dme', 2)))
+    # ... and from the diodes to the CP2102N on B.Cu, under the SS34 and the power path, up through
+    # vias in front of its pins 4 (DP) and 5 (DM), staggered so the two vias clear each other
+    u4 = [p for p in pads if p.ref == K['U_UART'] and p.num == '4'][0]
+    u5 = [p for p in pads if p.ref == K['U_UART'] and p.num == '5'][0]
+    for net, e, u, dy, k in ((dp, ep, u4, -0.3, 'p'), (dm, em, u5, 0.3, 'm')):
+        w0 = (round(e.cx + 1.2, 4), e.cy)                      # via east of the diode's pad
+        w1 = (round(u.cx - u.hw - 0.95, 4), round(u.cy + dy, 4))   # via west of the chip's pin
+        early.append(seg(e.cx, e.cy, *w0, w, 'F.Cu', net, ('usbb', k, 'a')))
+        early.append(via(*w0, net, ('usbb', k, 'v0'), 0.45, 0.2))
+        jog = w1[1] - w0[1]
+        mid = (round(w0[0] + abs(jog), 4), w1[1])
+        early.append(seg(*w0, *mid, w, 'B.Cu', net, ('usbb', k, 'b0')))
+        early.append(seg(*mid, *w1, w, 'B.Cu', net, ('usbb', k, 'b1')))
+        early.append(via(*w1, net, ('usbb', k, 'v1'), 0.45, 0.2))
+        knee = (round(u.cx - u.hw - 0.4, 4), u.cy)
+        early.append(seg(*w1, *knee, w, 'F.Cu', net, ('usbb', k, 'c0')))
+        early.append(seg(*knee, u.cx, u.cy, w, 'F.Cu', net, ('usbb', k, 'c1')))
     # UART0 (module pads 37 TXD0 / 36 RXD0, on its east side): the gap to the microSD takes one
     # track, not two, so both drop to B.Cu right at the module and run down to the CP2102N there
     mx, my, _ = PLACE[K['U_S3']]
     for k, (pad_dy, net, vdy) in enumerate(((-1.45, 'S3_TXD', -0.7), (-0.18, 'S3_RXD', 0.7))):
         px, py = mx + 8.75, my + pad_dy
         x1, vx, vy = px + 0.75, px + 1.45, py + vdy
-        board.append(seg(px, py, x1, py, 0.2, 'F.Cu', NET(net), ('uart0', k, 'a')))
-        board.append(seg(x1, py, vx, vy, 0.2, 'F.Cu', NET(net), ('uart0', k, 'b')))
-        board.append(via(vx, vy, NET(net), ('uart0', k, 'v')))
+        early.append(seg(px, py, x1, py, 0.2, 'F.Cu', NET(net), ('uart0', k, 'a')))
+        early.append(seg(x1, py, vx, vy, 0.2, 'F.Cu', NET(net), ('uart0', k, 'b')))
+        early.append(via(vx, vy, NET(net), ('uart0', k, 'v')))
     # the GND finger (pin 32): a locked stub up out of the tab and two vias into In1
     j = [p for p in pads if p.ref == K['J_EDGE'] and p.num == '32'][0]
     top = j.cy - j.hh
     yv = TAB_Y - 1.2
-    board.append(seg(j.cx, top + 0.3, j.cx, yv, 0.8, 'F.Cu', 'GND', ('f32', 's')))
+    early.append(seg(j.cx, top + 0.3, j.cx, yv, 0.8, 'F.Cu', 'GND', ('f32', 's')))
     for k, dx in enumerate((-0.55, 0.55)):
-        board.append(via(j.cx + dx, yv, 'GND', ('f32', 'v', k), 0.8, 0.4))
-    board.append(seg(j.cx - 0.55, yv, j.cx + 0.55, yv, 0.8, 'F.Cu', 'GND', ('f32', 'h')))
+        early.append(via(j.cx + dx, yv, 'GND', ('f32', 'v', k), 0.8, 0.4))
+    early.append(seg(j.cx - 0.55, yv, j.cx + 0.55, yv, 0.8, 'F.Cu', 'GND', ('f32', 'h')))
+    board += early
+    for e in early:
+        n = str(find(e, 'net')[1])
+        if e[0] == 'segment':
+            s0, s1 = find(e, 'start'), find(e, 'end')
+            pre.append((float(s0[1]), float(s0[2]), float(s1[1]), float(s1[2]), n, float(find(e, 'width')[1])))
+        else:
+            at = find(e, 'at')
+            pre_v.append((float(at[1]), float(at[2]), n))
+    served |= {id(p) for p in pads for (x0, y0, x1, y1, n, w) in pre
+               if p.net == n and (p.dist(x0, y0) < 1e-6 or p.dist(x1, y1) < 1e-6)}
+    keep = [crt[K[k]] for k in ('U_S3', 'J_USB', 'SW_S3EN', 'SW_S3BOOT') if K[k] in crt]
+    sx, sy, _ = PLACE[K['U_S3']]                       # the antenna keep-out band
+    keep.append((X0, Y0 - 1.0, X1, sy - 6.75 + 0.3))
+    holes = [(x, y, d / 2 + 0.5) for x, y, d in HOLES]
+    vias, segs, failed = fanout.plan(pads, keep, (X0, Y0, X1, TAB_Y), TAB_Y, holes,
+                                     skip_refs=(K['J_EDGE'],), extra_segs=pre, extra_vias=pre_v,
+                                     skip_pads=served)
+    for i, (x, y, n) in enumerate(vias):
+        board.append(via(x, y, n, ('fv', i), fanout.VIA_D, fanout.VIA_DRILL))
+    for i, (x0, y0, x1, y1, n, w) in enumerate(segs):
+        board.append(seg(x0, y0, x1, y1, round(w, 3), 'F.Cu', n, ('fs', i)))
     print('fan-out: %d vias, %d stubs%s' % (len(vias), len(segs), ('; FAILED: ' + ' '.join(failed)) if failed else ''))
 
 
@@ -543,6 +592,8 @@ def check_parts_inside(board):
         edge_ok = p.key in AT_EDGE
         if (not edge_ok and (x0 < X0 + 0.3 or x1 > X1 - 0.3)) or y0 < Y0 + 0.1 or y1 > TAB_Y - 0.3:
             bad.append('%s (%s) courtyard %.1f,%.1f..%.1f,%.1f outside the body' % (p.ref, p.key, x0, y0, x1, y1))
+        if x0 < NOTCH[2] + 0.3 and y1 > NOTCH[1] - 0.3:
+            bad.append('%s (%s) courtyard reaches the switch notch' % (p.ref, p.key))
         for hx, hy, hd in HOLES:
             cx, cy = min(max(hx, x0), x1), min(max(hy, y0), y1)
             if math.hypot(cx - hx, cy - hy) < HOLE_KEEP:
@@ -568,9 +619,11 @@ def write_case_anchors():
         'frame': 'KiCad board frame, mm, y down; F.Cu (every part) is the front, B.Cu (the cell) the back',
         'outline': [list(p) for p in OUTLINE], 'thickness': THICKNESS,
         'body': [X0, Y0, X1, TAB_Y], 'tab': [TAB_X0, TAB_Y, TAB_X1, Y1], 'insertion_edge_y': Y1,
-        'slot_y_estimate': SLOT_Y,
+        'slot_y_estimate': SLOT_Y, 'lip_y_estimate': LIP_Y,
         'holes': [list(h) for h in HOLES],
-        'cell_outline_back': list(CELL), 'cell_max_thickness': CELL_T,
+        'switch_notch': list(NOTCH),
+        'cell_on_shelf': list(CELL), 'shelf_top_z': SHELF_Z, 'cell_max_thickness': CELL_T,
+        'cell_leads': [PLACE[K['J_BAT']][0], PLACE[K['J_BAT']][1]],
         'usb_c_west': [X0, PLACE[K['J_USB']][1]], 'microsd_east': [X1, PLACE[K['J_SD']][1]],
         'sw_s3_en': at('SW_S3EN'), 'sw_s3_boot': at('SW_S3BOOT'),
         'led_wifi': at('D_LWIFI'), 'led_bus': at('D_LBUS'), 'led_charge': at('D_CHG'),
@@ -588,7 +641,11 @@ def write_case_anchors():
              'pcb_tab = %s;    // x0, y0, x1, y1 (insertion edge)' % v((TAB_X0, TAB_Y, TAB_X1, Y1)),
              'slot_y = %g;      // the Pocket\'s shell top, ESTIMATE: inside the slot below this' % SLOT_Y,
              'pcb_holes = [%s];   // [x, y, diameter]: M2' % ', '.join(v(h) for h in HOLES),
-             'cell_back = %s;   // x0, y0, x1, y1 of the cell on the back' % v(CELL),
+             'switch_notch = %s;   // x0, y0, x1, y1 cut from the board by the voltage switch (ESTIMATE)' % v(NOTCH),
+             'lip_y = %g;       // the Pocket\'s lip, ESTIMATE: it covers the component side below this' % LIP_Y,
+             'cell = %s;   // x0, y0, x1, y1 of the cell on the shelf over the component side' % v(CELL),
+             'shelf_z = %g;     // the shelf\'s top face above the board; the cell sits on it' % SHELF_Z,
+             'cell_leads = %s;  // the lead pads (+ at x + 3, - at x - 3)' % v(PLACE[K['J_BAT']][:2]),
              'cell_t = %g;' % CELL_T,
              'usb_c = %s;       // mouth on the west edge' % v(a['usb_c_west']),
              'microsd = %s;     // mouth on the east edge' % v(a['microsd_east']),
@@ -651,20 +708,26 @@ def main():
     for i, (x, y, d) in enumerate(HOLES):   # the shell holes: no copper near them
         for L in COPPER:
             board.append(zone('hole_%d' % i, None, L, circle_pts(x, y, d / 2 + 0.6), keepout=True))
-    z = zone('cell_landing', None, 'B.Cu', [(CELL[0], CELL[1]), (CELL[2], CELL[1]), (CELL[2], CELL[3]), (CELL[0], CELL[3])],
-             keepout=True)
-    find(z, 'keepout')[1:] = [['tracks', 'allowed'], ['vias', 'allowed'], ['pads', 'allowed'],
-                              ['copperpour', 'allowed'], ['footprints', 'not_allowed']]
-    board.append(z)
+    # the cell's place on the shell's shelf, for the shell (F.Fab)
+    c = CELL
+    for i, (p0, p1) in enumerate((((c[0], c[1]), (c[2], c[1])), ((c[2], c[1]), (c[2], c[3])),
+                                   ((c[2], c[3]), (c[0], c[3])), ((c[0], c[3]), (c[0], c[1])))):
+        board.append(['gr_line', ['start', *p0], ['end', *p1], ['stroke', ['width', 0.15], ['type', 'dash']],
+                      ['layer', Q('F.Fab')], ['uuid', uid('cellbox', i)]])
+    board.append(text('LiPo <= 30 x 50 x 5 on the shell shelf, %g mm up' % SHELF_Z, (c[0] + c[2]) / 2, c[1] + 1.5, 'F.Fab', 0.8))
     board.append(zone('GND_plane', 'GND', 'In1.Cu', BODY))
     board.append(zone('3V3_plane', '+3V3', 'In2.Cu', BODY))
     # where the Pocket's shell top falls (estimate), on the drawing layers
     board.append(['gr_line', ['start', X0, SLOT_Y], ['end', X1, SLOT_Y], ['stroke', ['width', 0.15], ['type', 'dash']],
-                  ['layer', Q('F.Fab')], ['uuid', uid('slotline')]])
-    board.append(text('Pocket shell top (estimate): inside the slot below', XC, SLOT_Y + 1.2, 'F.Fab', 0.8))
-    board.append(text('FujiNet Pocket Rev0', 100.0, 133.6, 'F.SilkS', 1.0))
-    board.append(text('github.com/FujiNetWIFI', XC, 124.5, 'B.SilkS', 1.0, mirror=True))
-    board.append(text('CERN-OHL-W-2.0  FujiNet Pocket Rev0', XC, 126.5, 'B.SilkS', 0.8, mirror=True))
+                  ['layer', Q('B.Fab')], ['uuid', uid('slotline')]])
+    board.append(text('Pocket top (estimate): the back lies against the Pocket below', XC, SLOT_Y + 1.2, 'B.Fab', 0.8,
+                      mirror=True))
+    board.append(['gr_line', ['start', X0, LIP_Y], ['end', X1, LIP_Y], ['stroke', ['width', 0.15], ['type', 'dash']],
+                  ['layer', Q('F.Fab')], ['uuid', uid('lipline')]])
+    board.append(text('Pocket lip (estimate): low parts only below', XC, LIP_Y + 1.2, 'F.Fab', 0.8))
+    board.append(text('FujiNet Pocket Rev0', 100.0, 134.4, 'F.SilkS', 1.0))
+    board.append(text('github.com/FujiNetWIFI', XC, 137.4, 'B.SilkS', 1.0, mirror=True))
+    board.append(text('CERN-OHL-W-2.0  FujiNet Pocket Rev0', XC, 139.4, 'B.SilkS', 0.8, mirror=True))
     board.append(['embedded_fonts', 'no'])
     open(PCB, 'w').write(dump(board) + '\n')
     print('placed %d parts -> %s' % (len(D.PARTS), os.path.basename(PCB)))

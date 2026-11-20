@@ -20,7 +20,7 @@ been ordered, built or run, and has not been fitted to a Pocket.
 | Netlist parity (kicad-cli netlist vs `tools/design.py`) | 41 / 41 nets |
 | `tools/check_pins.py` (the netlist vs `firmware/pocket.h`, plus the link path) | pass |
 | DRC, errors, with schematic parity | 0 violations, 0 unconnected, 0 parity |
-| DRC warnings | 6: 3 dangling stitch vias, 2 silk near the edge, 1 hole-to-hole |
+| DRC warnings | 5: 2 dangling stitch vias, 3 silk near the edge |
 | Shell, fit in a Pocket | not started (`case/README.md`) |
 
 `tools/build_all.sh` regenerates the schematic and the checks; `LAYOUT=1 tools/build_all.sh`
@@ -102,10 +102,10 @@ The device powers itself. The Pocket's cart rail has only been seen to supply ab
 ESP32-S3 on WiFi averages more than that and peaks several times higher (openFPGA-7800
 `docs/FUJINET_POCKET_DEVICE.md`, section 5).
 
-- **Cell:** a protected 1S LiPo pouch up to 30 x 40 x 5 mm, for example a 403040 or 503040
-  (400-600 mAh). It sits on the landing pad on the back (layout below), held by foam tape, with
-  its leads soldered to the pad's + and - pads. There is no connector, so there is no JST-PH
-  polarity to get wrong.
+- **Cell:** a protected 1S LiPo pouch up to 30 x 50 x 5 mm, for example a 403050 or 503050
+  (about 600-1000 mAh). It rides over the components on a shelf in the shell (layout below), with
+  its leads soldered to two pads on the board, marked + and -. There is no connector, so there is
+  no JST-PH polarity to get wrong.
   - The board has no protection circuit of its own: the cell's is relied on.
   - The cell is bought separately and is not on the BOM.
 - **Charger:** MCP73831-2 (4.20 V), 213 mA (R_PROG 4.7k, about 0.5 C for 400 mAh), from USB
@@ -148,20 +148,32 @@ as `include/pinmap/pocket.h` and `build-platforms/platformio-fujinet-pocket.ini`
   - B.Cu: signals and a GND pour.
 - **The tab:** the GB / GBA tab with its 32 fingers. The insertion corners are 0.9 mm arcs, as a
   GB cartridge's.
-- **Inside the slot** (below about 31 mm from the insertion edge, an estimate; the F.Fab layer
-  draws the line): only the two link buffers and their parts, over pins 5 and 31, plus the
-  bring-up pads.
-- **Above the Pocket, on the front:**
+- **The voltage-switch notch:** the body's lower-left corner (pin 1's side, seen from the
+  component side with the fingers down) is cut back 3.5 mm by 10 mm above the tab. The shell's
+  GBA-shaped corner can then be cut deep and wide enough never to touch the Pocket's voltage
+  switch, as a GBA board is relieved there. The tab itself is not cut, since pin 1 is the first
+  finger. The size is an **estimate** (`gen_pcb.NOTCH_W`, `NOTCH_H`).
+- **The Pocket's cartridge recess** (estimates, both drawn on the board's Fab layers):
+  - **Back:** below about 31 mm from the insertion edge, the board's flat back lies nearly flush
+    against the Pocket. Nothing is placed on the back.
+  - **Front** (the component side, the fingers' side): it faces the recess's open side, covered
+    only by the Pocket's lip below about 15 mm from the insertion edge. Only low parts go there:
+    the two link buffers over pins 5 and 31, the bring-up pads, the cell's lead pads.
+- **Above the recess, on the front:**
   - the ESP32-S3 at the top, its antenna flush with the top edge over its keep-out band (no
     copper, holes or parts across the board there);
   - USB-C on the west side and microSD on the east side;
   - the reset and BOOT buttons and the three LEDs down the west side;
   - below the module: the charger and power path, the TPS63001, the CP2102N.
-- **The battery's landing pad, on the back:**
-  - a 30 x 40 mm outline with corner marks, for a cell up to 5 mm thick, under the upper board;
-  - a B.Cu rule area over it keeps any part off the back there;
-  - the cell's leads solder to two pads at its west end, marked + and -, by the charger;
-  - nothing else is placed on the back, so assembly is single-sided.
+- **The battery, on a shelf in the shell:**
+  - the cell lies over the components, on a shelf whose top face is 4.4 mm above the board. The
+    tallest parts under it are the module and USB-C, at 3.1-3.2 mm.
+  - its place, 30 x 50 mm (x 88..118, y 79..129), is drawn on F.Fab and in the shell anchors. It
+    is clear of the antenna band and the two buttons.
+  - its leads come down from its lower end to two pads on the component side, just above the lip:
+    `+` at the east, `-` at the west.
+  - the 3D export shows a 30 x 50 x 4 mm stand-in at that height.
+  - nothing is placed on the back, so assembly is single-sided.
 - **Six M2 holes** (2.2 mm) for the shell, each kept 3 mm clear of parts:
   - two by the top corners, below the antenna band;
   - two just above the slot line;
@@ -175,7 +187,9 @@ as `include/pinmap/pocket.h` and `build-platforms/platformio-fujinet-pocket.ini`
      lays four things down by hand, locked:
      - the TPS63001's pins, to its inductor and capacitors as its datasheet shows, and its VIN /
        VINA loop;
-     - the USB-C D+ / D- crossover (D- under it on B.Cu, through two 0.45 / 0.2 mm vias);
+     - the USB pair: the USB-C crossover (D- under it on B.Cu, through two 0.45 / 0.2 mm vias),
+       on to the ESD diodes, then on B.Cu under the SS34 and the power path to the CP2102N's
+       pins 4 and 5;
      - the UART0 escapes from the module to B.Cu;
      - the GND finger's stub.
   2. Freerouting routes the rest.
@@ -191,15 +205,18 @@ as `include/pinmap/pocket.h` and `build-platforms/platformio-fujinet-pocket.ini`
 
 1. **Edge:** check the finger face, pin 1 and the board thickness (1.0 mm, as Gekkio's GB
    boards) against a GB cartridge in a Pocket. Measure where the Pocket's shell top falls on the
-   board (31 mm from the insertion edge is assumed).
+   board (31 mm from the insertion edge is assumed), and how far up the component side the
+   Pocket's lip covers it (15 mm is assumed: only low parts below). Measure the voltage switch
+   and size the board's notch for it (3.5 x 10 mm above the tab is assumed).
 2. **Shell:** print a blank with the GBA-shaped corner first, and check that it seats fully and
    clears the voltage switch and the shoulder buttons (`case/README.md`).
 3. **Sourcing:** no LCSC code chosen yet for SN74LVC1G34DBVR, MCP73831T-2ACI/OT, TPS63001DRCR,
    SWPA4030S1R5NT and the green LED (`FujiNet-Pocket-Rev0-BOM.csv`).
 4. **The inductor's saturation current** against the TPS63001's switch current limit (datasheet).
 5. **The microSD card-detect polarity:** it is wired to IO42 and set NC in `pocket.h` until known.
-6. **The microSD's locating pegs** come through the board under the cell's outline: check they
-   do not stand proud of the back.
+6. **The back in the recess:** check that the board's back, with its tented vias and silk,
+   slides against the Pocket without catching. The USB-C's shell legs and the microSD's pegs come
+   through it above the recess.
 7. **Fab review:**
    - the 4-layer, 1.0 mm stack;
    - hard gold on the fingers, with a bevel;
@@ -218,8 +235,8 @@ as `include/pinmap/pocket.h` and `build-platforms/platformio-fujinet-pocket.ini`
 | `tools/gen_sch.py`, `sch_draw.py`, `sexpr.py` | The generator and its checks (FujiNet-7800-Rev0's). |
 | `tools/harvest_symbols.py`, `symcache.sexpr` | The stock symbols embedded in the sheets. |
 | `tools/make_edge_fp.py` | The slot edge footprint. |
-| `tools/make_fp_extra.py` | The LiPo landing pad footprint. |
-| `tools/make_cell_step.py` | The cell's stand-in 3D model (a 40 x 30 x 4 mm box, STEP written by hand). |
+| `tools/make_fp_extra.py` | The cell's lead pads footprint. |
+| `tools/make_cell_step.py` | The cell's stand-in 3D model (a 30 x 50 x 4 mm box at shelf height, STEP written by hand). |
 | `tools/placement.py`, `tools/gen_pcb.py` | Where every part goes; the board generator (outline, holes, planes, keep-outs, the pre-routes, the shell anchors). |
 | `tools/fanout.py`, `route.py`, `finish_route.py`, `drc_fix.py`, `tidy_tracks.py`, `stitch_gnd.py`, `check_vias.py`, `fix_silk.py`, `fill_zones.py`, `set_models.py`, `route_board.sh` | Plane fan-out, Freerouting, the finisher and clean-up (FujiNet-7800-Rev0's). |
 | `tools/export_fab.py` | Gerbers, drill, positions, STEP, renders. |

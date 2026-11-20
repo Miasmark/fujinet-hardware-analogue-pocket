@@ -57,8 +57,9 @@ MODELS = {
     # LCSC model origin is the card centre on the locating-peg line (pegs at model (+/-4, 0));
     # the EasyEDA footprint has the pegs at (-4.9, 5.5) / (3.1, 5.5)
     'TF-SMD_TF-015': ('TF-015.step', (-0.9, -5.5, 0), (0, 0, 0)),
-    # the cell on the back: a plain 40 x 30 x 4 mm box (tools/make_cell_step.py), already below the board
-    'LiPo_Landing_30x40': ('LiPo_cell_40x30x4.step', (0, 0, 0), (0, 0, 0)),
+    # the cell on its shelf over the parts: a plain 30 x 50 x 4 mm box (tools/make_cell_step.py),
+    # written in the lead pads' frame at its place
+    'LiPo_Leads': ('LiPo_cell_30x50x4.step', (0, 0, 0), (0, 0, 0)),
 }
 
 

@@ -177,6 +177,9 @@ def plan(pads, keepouts, board_box, blade_y, holes, skip_refs=(), extra_segs=(),
                 if any(_pt_seg(ox, oy, p.cx, p.cy, vx, vy) < VIA_D / 2 + sw / 2 + CLR
                        for (ox, oy, on) in vias if on != p.net):
                     continue
+                if any(_seg_seg(p.cx, p.cy, vx, vy, *sg[:4]) < sw / 2 + sg[5] / 2 + CLR
+                       for sg in segs if sg[4] != p.net):    # nor across a hand-routed track
+                    continue
                 vias.append((vx, vy, p.net))
                 segs.append((p.cx, p.cy, vx, vy, p.net, sw))
                 done = True
@@ -204,3 +207,15 @@ def _pt_seg(px, py, x0, y0, x1, y1):
     L = dx * dx + dy * dy
     t = 0 if L == 0 else max(0, min(1, ((px - x0) * dx + (py - y0) * dy) / L))
     return math.hypot(px - (x0 + t * dx), py - (y0 + t * dy))
+
+
+def _seg_seg(ax, ay, bx, by, cx, cy, dx, dy):
+    """distance between segments ab and cd (0 if they cross)."""
+    def orient(px, py, qx, qy, rx, ry):
+        return (qx - px) * (ry - py) - (qy - py) * (rx - px)
+    o1, o2 = orient(ax, ay, bx, by, cx, cy), orient(ax, ay, bx, by, dx, dy)
+    o3, o4 = orient(cx, cy, dx, dy, ax, ay), orient(cx, cy, dx, dy, bx, by)
+    if (o1 > 0) != (o2 > 0) and (o3 > 0) != (o4 > 0) and o1 and o2 and o3 and o4:
+        return 0.0
+    return min(_pt_seg(ax, ay, cx, cy, dx, dy), _pt_seg(bx, by, cx, cy, dx, dy),
+               _pt_seg(cx, cy, ax, ay, bx, by), _pt_seg(dx, dy, ax, ay, bx, by))

@@ -1,21 +1,32 @@
 #!/usr/bin/env python3
-"""Write 3d/LiPo_cell_40x30x4.step: a plain box standing in for the 1S LiPo cell on the back of the
-board, so the board's STEP export (for the shell) and the renders show the cell where the landing
-pad puts it.  40 x 30 x 4 mm (a 403040; the pad takes up to 5 mm, gen_pcb.CELL_T), centred on the
-footprint origin, from z = -1.0 (the back of the 1.0 mm board) down to z = -5.0, in the
-footprint's own frame (KiCad puts a front footprint's model origin on the board's top face).
+"""Write 3d/LiPo_cell_30x50x4.step: a plain box standing in for the 1S LiPo cell, so the board's
+STEP export (for the shell) and the renders show the cell where the shell's shelf holds it: over
+the components on the component side, at gen_pcb.CELL (x, y) and gen_pcb.SHELF_Z above the board.
+30 x 50 x 4 mm (a 403050; the shelf is drawn for up to 5 mm, gen_pcb.CELL_T).  The box is written
+in the frame of the lead pads' footprint (J_BAT, placement.py), whose model it is: KiCad puts a
+front footprint's model origin on the board's top face, its +y = the board's -y.
 
 The STEP is written by hand (AP214, one manifold solid brep of six planar faces); no CAD library
 is needed.
 
 Usage: python3 tools/make_cell_step.py
 """
-import os
+import os, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT = os.path.join(HERE, '..', '3d', 'LiPo_cell_40x30x4.step')
-L, W, H = 40.0, 30.0, 4.0
-Z_TOP = -1.0                     # the board's back face (1.0 mm board)
+sys.path.insert(0, HERE)
+OUT = os.path.join(HERE, '..', '3d', 'LiPo_cell_30x50x4.step')
+H = 4.0
+
+
+def cell_box():
+    """(x0, x1, y0, y1, z0, z1) of the cell in J_BAT's model frame."""
+    import gen_pcb as G
+    G.do_placement(G.place, [])
+    fx, fy, rot = G.PLACE[G.K['J_BAT']]
+    assert rot == 0
+    cx0, cy0, cx1, cy1 = G.CELL
+    return (cx0 - fx, cx1 - fx, -(cy1 - fy), -(cy0 - fy), G.SHELF_Z, G.SHELF_Z + H)
 
 
 def main():
@@ -25,7 +36,7 @@ def main():
         ents.append(s)
         return '#%d' % (len(ents) + 99)       # entity ids start at 100
 
-    x0, x1, y0, y1, z0, z1 = -L / 2, L / 2, -W / 2, W / 2, Z_TOP - H, Z_TOP
+    x0, x1, y0, y1, z0, z1 = cell_box()
     P = {}
     for i, x in enumerate((x0, x1)):
         for j, y in enumerate((y0, y1)):
@@ -72,8 +83,8 @@ def main():
     body = '\n'.join('#%d = %s;' % (i + 100, s) for i, s in enumerate(ents))
     txt = """ISO-10303-21;
 HEADER;
-FILE_DESCRIPTION(('LiPo cell stand-in, 40 x 30 x 4 mm'),'2;1');
-FILE_NAME('LiPo_cell_40x30x4.step','2026-11-20T00:00:00',('FujiNet Pocket Rev0'),(''),'make_cell_step.py','','');
+FILE_DESCRIPTION(('LiPo cell stand-in, 30 x 50 x 4 mm'),'2;1');
+FILE_NAME('LiPo_cell_30x50x4.step','2026-11-20T00:00:00',('FujiNet Pocket Rev0'),(''),'make_cell_step.py','','');
 FILE_SCHEMA(('AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }'));
 ENDSEC;
 DATA;

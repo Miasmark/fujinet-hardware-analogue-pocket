@@ -256,13 +256,15 @@ add('U', 'Transistor_BJT:UMH3N', 'UMH3N', FP('SOT-363_SC-70-6'),
 
 # =========================================================================
 sheet('power')
-# The cell: a protected 1S LiPo pouch up to 30 x 40 mm (a 403040 / 503040, 400-600 mAh), taped to
-# the landing pad on the back of the upper board, its leads soldered to the pad's two B.Cu pads:
+# The cell: a protected 1S LiPo pouch up to 30 x 50 x 5 mm (a 403050 / 503050, 600-1000 mAh), riding
+# over the components on a shelf in the shell, on the component side (which faces the open side of
+# the Pocket's cartridge recess; the board's flat back lies against the Pocket); its leads soldered
+# to two pads on the component side:
 # no connector, so no JST-PH polarity to get wrong (cells come wired both ways).  Its own
 # protection circuit is relied on; there is none on this board.  Not a BOM line: the cell is
 # bought separately (README.md).
-add('J', 'Connector_Generic:Conn_01x02', 'LiPo', FP('LiPo_Landing_30x40'), {1: 'VBAT', 2: 'GND'},
-    desc='1S LiPo, protected, <= 30 x 40 x 5 mm: leads to pad 1 (+) and 2 (-) on the back', bom=False,
+add('J', 'Connector_Generic:Conn_01x02', 'LiPo', FP('LiPo_Leads'), {1: 'VBAT', 2: 'GND'},
+    desc='1S LiPo, protected, <= 30 x 50 x 5 mm, on a shelf in the shell: leads to pad 1 (+) and 2 (-)', bom=False,
     key='J_BAT')
 # Charger: MCP73831-2 (4.20 V), I = 1000 V / R_PROG: 4.7k = 213 mA, about 0.5 C for 400 mAh.
 add('U', 'Battery_Management:MCP73831-2-OT', 'MCP73831-2', FP('SOT-23-5'),

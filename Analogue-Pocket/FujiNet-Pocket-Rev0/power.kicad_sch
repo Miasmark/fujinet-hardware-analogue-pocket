@@ -3524,7 +3524,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "FujiNet-Pocket:LiPo_Landing_30x40"
+		(property "Footprint" "FujiNet-Pocket:LiPo_Leads"
 			(at 170.18 45.72 0)
 			(effects
 				(font
@@ -3542,7 +3542,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "1S LiPo, protected, <= 30 x 40 x 5 mm: leads to pad 1 (+) and 2 (-) on the back"
+		(property "Description" "1S LiPo, protected, <= 30 x 50 x 5 mm, on a shelf in the shell: leads to pad 1 (+) and 2 (-)"
 			(at 170.18 45.72 0)
 			(effects
 				(font
