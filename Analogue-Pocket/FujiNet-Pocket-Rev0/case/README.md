@@ -7,12 +7,13 @@ it has to respect.
 
 `FujiNet-Pocket-Shell.scad` (OpenSCAD 2021.01) builds three parts from `board-anchors.scad`, so it
 follows the board whenever the layout is re-run. Pick the part with `-D 'part="front"'`, `"lid"`,
-`"back"`, `"assembly"` or `"all"`; ready STLs are in `stl/`.
+`"plungers"`, `"back"`, `"assembly"` or `"all"`; ready STLs are in `stl/`.
 
 | Part | What | Print |
 |---|---|---|
-| **front** | Walls round the board and a roof over the parts, 0.3 mm above the tallest. The roof is the battery shelf. On top: the battery bay. Below the lip: a low band, stopping just above the fingers. The USB-C (west) and microSD (east) windows. Pin holes over the two buttons, light-pipe holes over the three LEDs. The cell's lead slot over its pads. Bosses at the six holes: M2 pilots at the four above the recess, locating pins through the two inside it. | Roof down; supports only under the side windows |
-| **lid** | Closes the battery bay, with a locating lip. | Flat |
+| **front** | Walls round the board and a roof over the parts, 0.3 mm above the tallest. The roof is the battery shelf. On top: the battery bay. Below the lip: a low band, stopping just above the fingers. The USB-C (west) and microSD (east) windows. Guide collars for the two button plungers. Light-pipe holes (1.6 mm) over the three LEDs. The cell's lead slot over its pads. Bosses at the six holes: M2 pilots at the four above the recess, locating pins through the two inside it. | Roof down; supports only under the side windows |
+| **lid** | Closes the battery bay, with a locating lip. Its face has the label recess: 0.4 mm deep, 1.5 mm in from the edges, about 31 x 51 mm. | Face down |
+| **plungers** (2) | For the S3 reset and BOOT buttons. A 2.2 mm stem through a guide collar on the roof. A 4 mm flange under the roof keeps each one captive: fit them from inside before the board goes in. The top stands 0.6 mm above the collar, beside the battery bay's wall: press with a fingertip or nail, which also keeps them from being pressed by accident. | Standing on the stem's foot; the flange's 0.9 mm overhang needs no support |
 | **back** | A plate over the board's back above the recess only, 1.3 mm off the board (the USB-C legs stand about 1 mm proud). Four M2 counterbored holes. Inside the recess the board's back stays bare, flush against the Pocket. | Outside down |
 
 ![front, outside and inside](shell-front.png)
@@ -20,18 +21,26 @@ follows the board whenever the layout is re-run. Pick the part with `-D 'part="f
 **Fasteners:** 4x M2 x 8 pan head, from the back plate through the board into the front's bosses.
 The pilots are 1.7 mm for self-tapping; open them to 3.2 mm for M2 heat-set inserts.
 
-**Overall thickness:** board 1.0 + the parts' roof 4.4 + cell 5.0 + 0.5 + lid 1.0 = about 12 mm
+![lid label recess and plungers](shell-parts.png)
+
+**Light pipes (not printed):** each LED is 3.6 mm under the 0.8 mm roof, so a pipe is about 4.4 mm
+long. Options:
+- **1.5 mm clear acrylic rod or end-glow optical fibre:** cut to 4.5 mm, pushed through the hole
+  to just above the LED, held with a drop of CA or UV glue.
+- **Off-the-shelf press-fit light pipes:** Bivar, Dialight or Lumex round PC / acrylic pipes. Set
+  `led_d` to the part's barrel.
+- **Clear UV resin or epoxy:** fill each hole flush from outside.
+- **Translucent filament:** print the front in it and leave a 0.4 mm skin over each hole.
+
+**Overall thickness:** board 1.0 + the parts' roof 4.4 + cell 5.0 + 0.5 + lid 1.2 = about 12 mm
 over the battery, from the board's back. The back plate adds 2.3 mm above the recess only.
 
 **Draft:**
 - Every recess number comes from the estimates in `board-anchors.scad`. Print the front and fit it
   to a Pocket before anything else.
 - Still to come:
-  - the button plungers;
-  - light pipes;
   - snap fits in place of screws, if wanted;
-  - rounding;
-  - a label recess.
+  - rounding.
 
 ## Inputs
 

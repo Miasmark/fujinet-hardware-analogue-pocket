@@ -20,9 +20,14 @@
 // Parts (part = ...):
 //   "front"    over the component side: walls, roof / shelf, battery bay, bosses, windows.
 //              Print roof-down (bay walls down), supports only under the USB-C / microSD windows.
-//   "lid"      closes the battery bay (a plate with a locating lip).  Print flat.
+//   "lid"      closes the battery bay (a plate with a locating lip), the label recess on its
+//              face.  Print face-down.
+//   "plungers" the two button plungers (S3 reset, S3 BOOT): a stem through a guide collar on
+//              the roof, a flange under the roof that keeps it captive (fit it from inside before
+//              the board goes in).  Print standing on the stem's foot; the flange's 0.9 mm
+//              overhang needs no support.
 //   "back"     over the back, above slot_y only.  Print outside-down.
-//   "assembly" all three around a board stand-in; "all" the three laid out to print.
+//   "assembly" all of them around a board stand-in; "all" laid out to print.
 // Fasteners: 4x M2 x 8 pan head from the back plate through the board into the front piece's
 // bosses at the four holes above slot_y (self-tapping 1.7 mm pilots, or 3.2 mm for M2 heat-set
 // inserts); the two holes inside the recess take the front piece's locating pins.
@@ -45,7 +50,9 @@ cover_end = 142.5;  // the front piece stops here (board y): the fingers start a
 swell    = 0.5;     // room over the cell for it to swell
 bay_clr  = 0.6;     // cell to the bay's walls
 bay_wall = 1.4;
-lid_t    = 1.0;
+lid_t    = 1.2;
+label_inset = 1.5;  // the label recess on the lid's face: inset from the lid's edges
+label_t  = 0.4;     // and its depth
 lid_lip  = 1.0;     // the lid's locating lip down inside the bay
 lid_lip_t = 0.8;
 boss_d   = 5.0;     // bosses (the board keeps a 3 mm part-free ring round each hole)
@@ -59,8 +66,17 @@ back_t   = 1.0;
 back_end_clr = 1.0; // the back plate stops this far above slot_y
 usb_win  = [9.6, 3.8];   // USB-C window in the west wall: along y, along z (from the board's front - 0.2)
 sd_win   = [12.4, 2.6];  // microSD window in the east wall
-btn_d    = 2.0;     // pin holes over the two buttons
-led_d    = 1.6;     // light-pipe holes over the three LEDs
+led_d    = 1.6;     // light-pipe holes over the three LEDs (1.5 mm acrylic rod / end-glow fibre)
+// button plungers: TS-1187A, 1.5 mm above the board's front, ~0.25 mm travel
+sw_h      = 1.5;
+press_gap = 0.15;   // the stem above the switch at rest
+stem_d    = 2.2;
+stem_hole = 2.5;    // through the roof and the guide collar
+flange_d  = 4.0;    // under the roof: the plunger is captive
+flange_t  = 0.6;
+collar_d  = 4.2;    // guide collar on the roof
+collar_h  = 1.0;
+proud     = 0.6;    // the stem's top above the collar at rest
 lead_slot = [12, 2.4];   // the cell's lead slot through the shelf (x, y), at the cell's lower end
 
 $fn = 40;
@@ -79,6 +95,7 @@ back_y_end = slot_y - back_end_clr;
 screw_holes = [for (h = pcb_holes) if (h[1] < slot_y) h];
 pin_holes   = [for (h = pcb_holes) if (h[1] >= slot_y) h];
 assert(roof_bot - z_f >= part_h, "the shelf's underside must clear the tallest part");
+assert(roof_bot - flange_t - 0.1 > z_f + sw_h + press_gap, "the plunger's flange must sit above its stem's foot");
 
 // ---------------------------------------------------------- 2D shapes -------
 module board2d() { polygon(pcb_outline); }
@@ -105,13 +122,16 @@ module front() {
         // windows: USB-C (west), microSD (east)
         translate([usb_c[0] - 5, usb_c[1] - usb_win[0] / 2, z_f - 0.2]) cube([8, usb_win[0], usb_win[1]]);
         translate([microsd[0] - 3, microsd[1] - sd_win[0] / 2, z_f - 0.2]) cube([8, sd_win[0], sd_win[1]]);
-        // button pin holes, LED light-pipe holes
-        for (p = [sw_s3_en, sw_s3_boot]) translate([p[0], p[1], roof_bot - 1]) cylinder(d = btn_d, h = roof + 2);
+        // button plunger holes (through the roof and its guide collar), LED light-pipe holes
+        for (p = [sw_s3_en, sw_s3_boot]) translate([p[0], p[1], roof_bot - 1]) cylinder(d = stem_hole, h = roof + collar_h + 2);
         for (p = [led_wifi, led_bus, led_charge]) translate([p[0], p[1], roof_bot - 1]) cylinder(d = led_d, h = roof + 2);
         // the cell's lead slot, at the bay's lower end over the pads
         translate([cell_leads[0] - lead_slot[0] / 2, bay_in[3] - lead_slot[1], roof_bot - 1])
             cube([lead_slot[0], lead_slot[1], roof + 2]);
     }
+    // guide collars on the roof round the plunger holes
+    for (p = [sw_s3_en, sw_s3_boot]) translate([p[0], p[1], roof_top - eps])
+        difference() { cylinder(d = collar_d, h = collar_h + eps); translate([0, 0, -1]) cylinder(d = stem_hole, h = collar_h + 2); }
     // bosses down to the board's front: screw pilots above slot_y, locating pins inside the recess
     for (h = screw_holes) translate([h[0], h[1], z_f])
         difference() {
@@ -127,7 +147,10 @@ module front() {
 // ---------------------------------------------------------- the lid ---------
 module lid() {
     translate([0, 0, bay_top]) {
-        linear_extrude(lid_t) rect2d(bay_out);
+        difference() {
+            linear_extrude(lid_t) rect2d(bay_out);
+            translate([0, 0, lid_t - label_t]) linear_extrude(label_t + eps) offset(delta = -label_inset) rect2d(bay_out);
+        }
         translate([0, 0, -lid_lip]) linear_extrude(lid_lip + eps)
             difference() {
                 offset(delta = -0.15) rect2d(bay_in);
@@ -135,6 +158,17 @@ module lid() {
             }
     }
 }
+
+// ---------------------------------------------------------- the plungers ----
+// One plunger, built standing on the board's front at the switch: stem from just above the switch
+// up through the roof and collar to `proud` above it, flange just under the roof.
+plunger_z0 = z_f + sw_h + press_gap;
+plunger_top = roof_top + collar_h + proud;
+module plunger() {
+    translate([0, 0, plunger_z0]) cylinder(d = stem_d, h = plunger_top - plunger_z0);
+    translate([0, 0, roof_bot - flange_t - 0.1]) cylinder(d = flange_d, h = flange_t);
+}
+module plungers() { for (p = [sw_s3_en, sw_s3_boot]) translate([p[0], p[1], 0]) plunger(); }
 
 // ---------------------------------------------------------- the back --------
 module back() {
@@ -163,16 +197,19 @@ module board_standin() {
 mirror([0, 1, 0]) {
     if (part == "front") front();
     if (part == "lid") lid();
+    if (part == "plungers") plungers();
     if (part == "back") back();
     if (part == "assembly") {
         board_standin();
         color("SteelBlue", 0.55) front();
         color("LightSteelBlue", 0.8) lid();
+        color("OrangeRed") plungers();
         color("SlateGray", 0.8) back();
     }
     if (part == "all") {
         front();
         translate([70, 0, 0]) translate([0, 0, -bay_top]) lid();
         translate([140, 0, back_gap + back_t]) back();
+        for (k = [0, 1]) translate([60 + 8 * k, -40, -plunger_z0]) plunger();
     }
 }
