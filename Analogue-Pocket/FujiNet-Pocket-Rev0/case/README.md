@@ -3,6 +3,36 @@
 No shell is designed yet. This is what the board gives a shell, molded or printed, and the limits
 it has to respect.
 
+## The draft shell
+
+`FujiNet-Pocket-Shell.scad` (OpenSCAD 2021.01) builds three parts from `board-anchors.scad`, so it
+follows the board whenever the layout is re-run. Pick the part with `-D 'part="front"'`, `"lid"`,
+`"back"`, `"assembly"` or `"all"`; ready STLs are in `stl/`.
+
+| Part | What | Print |
+|---|---|---|
+| **front** | Walls round the board and a roof over the parts, 0.3 mm above the tallest. The roof is the battery shelf. On top: the battery bay. Below the lip: a low band, stopping just above the fingers. The USB-C (west) and microSD (east) windows. Pin holes over the two buttons, light-pipe holes over the three LEDs. The cell's lead slot over its pads. Bosses at the six holes: M2 pilots at the four above the recess, locating pins through the two inside it. | Roof down; supports only under the side windows |
+| **lid** | Closes the battery bay, with a locating lip. | Flat |
+| **back** | A plate over the board's back above the recess only, 1.3 mm off the board (the USB-C legs stand about 1 mm proud). Four M2 counterbored holes. Inside the recess the board's back stays bare, flush against the Pocket. | Outside down |
+
+![front, outside and inside](shell-front.png)
+
+**Fasteners:** 4x M2 x 8 pan head, from the back plate through the board into the front's bosses.
+The pilots are 1.7 mm for self-tapping; open them to 3.2 mm for M2 heat-set inserts.
+
+**Overall thickness:** board 1.0 + the parts' roof 4.4 + cell 5.0 + 0.5 + lid 1.0 = about 12 mm
+over the battery, from the board's back. The back plate adds 2.3 mm above the recess only.
+
+**Draft:**
+- Every recess number comes from the estimates in `board-anchors.scad`. Print the front and fit it
+  to a Pocket before anything else.
+- Still to come:
+  - the button plungers;
+  - light pipes;
+  - snap fits in place of screws, if wanted;
+  - rounding;
+  - a label recess.
+
 ## Inputs
 
 All of these are generated: run `tools/gen_pcb.py`, then `tools/export_fab.py`.

@@ -258,7 +258,7 @@ renders and the shell anchors, and fit a printed blank.
 | `tools/fanout.py`, `route.py`, `finish_route.py`, `drc_fix.py`, `tidy_tracks.py`, `stitch_gnd.py`, `check_vias.py`, `fix_silk.py`, `fill_zones.py`, `set_models.py`, `route_board.sh` | Plane fan-out, Freerouting, the finisher and clean-up (FujiNet-7800-Rev0's). |
 | `tools/export_fab.py` | Gerbers, drill, positions, STEP, renders. |
 | `FujiNet-Pocket-Rev0.kicad_pcb` | The board (generated). |
-| `case/` | The shell notes and the board's anchors for it. |
+| `case/` | The draft shell (`FujiNet-Pocket-Shell.scad`, STLs in `case/stl/`), its notes, and the board's anchors for it. |
 | `3d/` | The 3D models (FujiNet-7800-Rev0's set, plus the cell's stand-in). |
 | `exports/` | The fab and STEP outputs. |
 | `tools/check_pins.py` | The netlist against `firmware/pocket.h` and the link path. |
