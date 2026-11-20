@@ -51,17 +51,17 @@ THICKNESS = 1.0
 SLOT_Y = 119.0                  # the Pocket's shell top, ESTIMATE (placement.py): the back is flush below
 LIP_Y = 135.0                   # the Pocket's lip over the component side, ESTIMATE: low parts below
 CH_TOP, CH_SH, CH_TAB = 2.0, 0.6, EG.R_CORNER      # chamfers: top corners, tab shoulders, insertion corners
-# the voltage-switch notch: the body's lower-left corner (pin 1's side, seen from the component side
-# with the fingers down) cut back above the tab, so the shell's GBA-shaped corner there can be cut
-# deep and wide enough never to touch the Pocket's voltage switch.  ESTIMATE -- measure the switch
-# on a Pocket; the tab (pin 1 is the first finger) is not cut.
-NOTCH_W, NOTCH_H = 3.5, 10.0
-NOTCH = (X0, TAB_Y - NOTCH_H, X0 + NOTCH_W, TAB_Y)
+# the voltage-switch corner: on the left (pin 1's side, seen from the component side with the
+# fingers down) the tab's edge runs straight on up NOTCH_H past the tab base before the body steps
+# out to its full width, so the shell's GBA-shaped corner there clears the Pocket's voltage switch.
+# ESTIMATE -- measure the switch on a Pocket.
+NOTCH_H = 10.0
+NOTCH = (X0, TAB_Y - NOTCH_H, TAB_X0, TAB_Y)
 OUTLINE = [(X0 + CH_TOP, Y0), (X1 - CH_TOP, Y0), (X1, Y0 + CH_TOP),
            (X1, TAB_Y - CH_SH), (X1 - CH_SH, TAB_Y), (TAB_X1, TAB_Y),
            (TAB_X1, Y1 - CH_TAB), (TAB_X1 - CH_TAB, Y1), (TAB_X0 + CH_TAB, Y1), (TAB_X0, Y1 - CH_TAB),
-           (TAB_X0, TAB_Y), (NOTCH[2], TAB_Y), (NOTCH[2], NOTCH[1]), (X0, NOTCH[1]), (X0, Y0 + CH_TOP)]
-BODY = [(X0, Y0), (X1, Y0), (X1, TAB_Y), (NOTCH[2], TAB_Y), (NOTCH[2], NOTCH[1]), (X0, NOTCH[1])]   # planes / pours
+           (TAB_X0, NOTCH[1]), (X0 + CH_SH, NOTCH[1]), (X0, NOTCH[1] - CH_SH), (X0, Y0 + CH_TOP)]
+BODY = [(X0, Y0), (X1, Y0), (X1, TAB_Y), (TAB_X0, TAB_Y), (TAB_X0, NOTCH[1]), (X0, NOTCH[1])]   # planes / pours
 # M2 holes for the shell (x, y, diameter): two by the top corners below the antenna band, two
 # just above the slot line, two inside the slot; parts keep HOLE_KEEP from each centre
 HOLES = [(77.5, 76.5, 2.2), (122.5, 76.5, 2.2), (77.5, 116.0, 2.2), (122.5, 116.0, 2.2),

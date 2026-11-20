@@ -49,8 +49,9 @@ All of these are generated: run `tools/gen_pcb.py`, then `tools/export_fab.py`.
 
 1. **Voltage switch:** the lower corner over the Pocket's voltage switch must be **GBA-shaped**,
    so the switch is never pressed and the slot stays at 3.3 V. A GB/GBC corner puts the slot at
-   5 V. Cut it 0.5-1 mm deeper and wider than a GBA cart's. The board is notched there
-   (`switch_notch`, 3.5 x 10 mm above the tab, an estimate), so the corner has room. Print a
+   5 V. Cut it 0.5-1 mm deeper and wider than a GBA cart's. On that side the board keeps the
+   tab's width for 10 mm above the tab base (`switch_notch`, an estimate), so the corner has
+   room. Print a
    blank first and check that it seats fully and clears the switch.
 2. **Antenna:** keep the top 7 mm (the module's antenna, flush with the top edge) under plastic
    only: no metal, no screws, no ink or paint with metal in it, and a thin wall. The cell stops

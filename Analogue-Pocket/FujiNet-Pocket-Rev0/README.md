@@ -20,7 +20,7 @@ been ordered, built or run, and has not been fitted to a Pocket.
 | Netlist parity (kicad-cli netlist vs `tools/design.py`) | 41 / 41 nets |
 | `tools/check_pins.py` (the netlist vs `firmware/pocket.h`, plus the link path) | pass |
 | DRC, errors, with schematic parity | 0 violations, 0 unconnected, 0 parity |
-| DRC warnings | 5: 2 dangling stitch vias, 3 silk near the edge |
+| DRC warnings | 4: 2 dangling stitch vias, 2 silk near the edge |
 | Shell, fit in a Pocket | not started (`case/README.md`) |
 
 `tools/build_all.sh` regenerates the schematic and the checks; `LAYOUT=1 tools/build_all.sh`
@@ -148,11 +148,10 @@ as `include/pinmap/pocket.h` and `build-platforms/platformio-fujinet-pocket.ini`
   - B.Cu: signals and a GND pour.
 - **The tab:** the GB / GBA tab with its 32 fingers. The insertion corners are 0.9 mm arcs, as a
   GB cartridge's.
-- **The voltage-switch notch:** the body's lower-left corner (pin 1's side, seen from the
-  component side with the fingers down) is cut back 3.5 mm by 10 mm above the tab. The shell's
-  GBA-shaped corner can then be cut deep and wide enough never to touch the Pocket's voltage
-  switch, as a GBA board is relieved there. The tab itself is not cut, since pin 1 is the first
-  finger. The size is an **estimate** (`gen_pcb.NOTCH_W`, `NOTCH_H`).
+- **The voltage-switch corner:** on the left (pin 1's side, seen from the component side with
+  the fingers down), the tab's edge runs straight on up 10 mm past the tab base before the body
+  steps out to full width. The shell's GBA-shaped corner there then clears the Pocket's voltage
+  switch. The height is an **estimate** (`gen_pcb.NOTCH_H`).
 - **The Pocket's cartridge recess** (estimates, both drawn on the board's Fab layers):
   - **Back:** below about 31 mm from the insertion edge, the board's flat back lies nearly flush
     against the Pocket. Nothing is placed on the back.
@@ -207,7 +206,7 @@ as `include/pinmap/pocket.h` and `build-platforms/platformio-fujinet-pocket.ini`
    boards) against a GB cartridge in a Pocket. Measure where the Pocket's shell top falls on the
    board (31 mm from the insertion edge is assumed), and how far up the component side the
    Pocket's lip covers it (15 mm is assumed: only low parts below). Measure the voltage switch
-   and size the board's notch for it (3.5 x 10 mm above the tab is assumed).
+   and size the left corner's step for it (10 mm above the tab base is assumed).
 2. **Shell:** print a blank with the GBA-shaped corner first, and check that it seats fully and
    clears the voltage switch and the shoulder buttons (`case/README.md`).
 3. **Sourcing:** no LCSC code chosen yet for SN74LVC1G34DBVR, MCP73831T-2ACI/OT, TPS63001DRCR,
