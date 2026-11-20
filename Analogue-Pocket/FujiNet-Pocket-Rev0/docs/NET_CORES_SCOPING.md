@@ -62,18 +62,39 @@ the USB keyboard is controller 3 and the mouse is controller 4.
   - it is controller 3 with type 4, `cont3_key[31:28] == 4`;
   - up to six held keys, as HID usage codes: four in `cont3_joy[31:0]`, one per byte, and two in
     `cont3_trig[15:0]`;
-  - the HID modifier byte (Ctrl, Shift, Alt, GUI, left and right) in `cont3_key[7:0]`.
+  - the HID modifier byte (Ctrl, Shift, Alt, GUI, left and right) in `cont3_key[7:0]`, by that
+    core; the Atari ST core puts it in `[15:8]` (below: verify).
 
   That core decodes one code per clock in an 8-clock round, after a whole-word toggle handshake
   across the clock domains. Both can be reused as they are. A terminal needs:
   - key-down and repeat events, found by comparing each round's six codes with the last round's;
   - typematic repeat;
   - a HID-to-ASCII/VT table, with a layout setting (US first).
-- **Mouse: format unverified.** The openFPGA pages that could be read don't document it.
-  - **Verify** by drawing `cont4_key`, `cont4_joy` and `cont4_trig` as hex on screen in a test
-    core, then moving the mouse, pressing buttons and turning the wheel.
-  - Expect a type value in `cont4_key[31:28]`, relative X/Y counts, buttons, and maybe a wheel.
-  - Phase 1 doesn't need it.
+- **Mouse: documented by the Atari ST core**, defgenx/openfpga-AtariST, `docs/input.md`. Only
+  the facts are taken here, in this note's words; that core's code is GPL-3.0 and none of it is
+  used.
+  - It is controller 4, with type 5: `cont4_key[31:28] == 5`. (Keyboard type 4 on controller 3
+    matches the Intellivision core.)
+  - **Relative X motion:** `cont4_joy[15:0]`, 16 bits.
+  - **Relative Y motion:** `cont4_trig[15:0]`, 16 bits.
+  - **Buttons:** `cont4_joy[18:16]`, three bits.
+  - **Report counter:** `cont4_key[15:0]`.
+  - The ST core turns the motion into PS/2 IntelliMouse packets. Its README calls the Dock
+    keyboard and mouse only lightly tested on hardware.
+  - **Not stated there, so verify on hardware:**
+    - whether X and Y are signed deltas per report or running totals, and which way is positive;
+    - how the counter should be used: presumably, take the motion once each time it changes;
+    - which button bit is left, right or middle;
+    - whether there is a wheel.
+
+    The test is to draw the three cont4 words as hex on screen in a test core, then move the mouse,
+    press each button and turn the wheel.
+  - Phase 1 doesn't need the mouse.
+- **Keyboard modifier byte: the two cores disagree.** The Intellivision core reads the HID modifier
+  byte from `cont3_key[7:0]`; the ST core's doc gives `cont3_key[15:8]`. **Verify** which one is
+  right with the same hex test (press Shift and Ctrl). If `[15:0]` is a report counter on
+  controller 3, as it is on controller 4, then `[15:8]` is more likely right, and the
+  Intellivision core needs a fix.
 - **Without a Dock:** an on-screen keyboard, built on the Intellivision core's `intv_osk_draw.sv`
   and `tools/osk.py` layout tool. On the handheld, the D-pad moves the cursor and A types.
   - The ECS layout there is 5 rows. A terminal wants a fuller one (Esc, Tab, Ctrl, arrows).
@@ -133,7 +154,7 @@ no modern page layout.
   - character entities and UTF-8 to the font.
 
   Pages above a size limit are cut off.
-- **Navigation:** the mouse (once section 1's format is known) or the keyboard or D-pad. Links,
+- **Navigation:** the mouse (once the details in section 1 are checked) or the keyboard or D-pad. Links,
   scrolling, back and forward, and bookmarks in a save file.
 - **Images:** none at first. A later step could have the ESP32 decode a small image to a palette
   bitmap (section 1, option B).
@@ -145,7 +166,7 @@ no modern page layout.
   anywhere.
 
 **Risk: moderate.** The renderer is the most work, but it is ordinary C. The other unknowns are
-the mouse format, the link rate and Gemini's TLS.
+the mouse details, the link rate and Gemini's TLS.
 
 ## 4. An "update cores" core
 
@@ -211,7 +232,9 @@ commands):
 
 ## 5. Open questions
 
-1. **Mouse format** (controller 4): log it on hardware (section 1).
+1. **Mouse details and the keyboard's modifier byte:** log controllers 3 and 4 on hardware
+   (section 1). The layout is known from the Atari ST core; the sign of the motion, the button
+   order and the modifier byte's position are not.
 2. **Link rate:** which bauds the RS232 build accepts, and a check at speed through the slot.
 3. **SSH and TLS-over-TCP** in the S3 RS232 build (sections 2 and 3).
 4. **Save-file writes:** what data.json flags a dialling directory or bookmark file needs
