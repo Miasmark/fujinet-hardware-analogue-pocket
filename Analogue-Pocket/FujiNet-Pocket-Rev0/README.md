@@ -10,6 +10,8 @@ This board is therefore only the FujiNet half of a FujiNet cartridge: no bus log
 console-side microcontroller. It is the same for every Pocket core that speaks this link. The
 first is openFPGA-7800 (2.2.7: CONFIG, the network devices and game loading, tested with
 fujinet-pc on the link port). An Intellivision core and a 2600 core are scoped to follow.
+Cores of the cart's own, a net terminal and a text web browser, are scoped in
+[docs/NET_CORES_SCOPING.md](docs/NET_CORES_SCOPING.md).
 
 **Status (2026-11-20): draft, schematic and board.** It is placed and routed, but has not
 been ordered, built or run, and has not been fitted to a Pocket.
@@ -21,7 +23,7 @@ been ordered, built or run, and has not been fitted to a Pocket.
 | `tools/check_pins.py` (the netlist vs `firmware/pocket.h`, plus the link path) | pass |
 | DRC, errors, with schematic parity | 0 violations, 0 unconnected, 0 parity |
 | DRC warnings | 4: 2 dangling stitch vias, 2 silk near the edge |
-| Shell, fit in a Pocket | not started (`case/README.md`) |
+| Shell, fit in a Pocket | draft shell drawn (`case/`), not yet printed or fitted |
 
 `tools/build_all.sh` regenerates the schematic and the checks; `LAYOUT=1 tools/build_all.sh`
 also regenerates the board and its outputs. It needs:
@@ -265,6 +267,7 @@ renders and the shell anchors, and fit a printed blank.
 | `tools/bom.py` | `FujiNet-Pocket-Rev0-BOM.csv`. |
 | `firmware/` | The proposed fujinet-firmware pin map and build env. |
 | `docs/FujiNet-Pocket-Rev0-schematic.pdf` | The schematic. |
+| `docs/NET_CORES_SCOPING.md` | Scoping note: other cores for the cart (a net terminal, a text web browser) and why an "update cores" core isn't possible today. |
 
 ## Provenance and license
 
