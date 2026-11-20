@@ -1,0 +1,515 @@
+(kicad_sch
+	(version 20250114)
+	(generator "eeschema")
+	(generator_version "9.0")
+	(uuid "ff394b2b-0001-5468-a47f-d8dd41a97fc7")
+	(paper "A3")
+	(title_block
+		(title "FujiNet Pocket Rev0")
+		(date "2026-11-20")
+		(rev "0")
+		(company "FujiNet")
+		(comment 1 "Generated from tools/design.py + tools/sch_layout.py - edit those, not this file")
+		(comment 2 "CERN-OHL-W-2.0 (derived from FujiNet-7800-Rev0 and its sources)")
+		(comment 3 "DRAFT: schematic only, not laid out or built; see README.md")
+	)
+	(lib_symbols)
+	(sheet
+		(at 30.48 45.72)
+		(size 33.02 20.32)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 255 255 225 1)
+		)
+		(uuid "9eeae63a-1566-58ff-b304-5075c4325b29")
+		(property "Sheetname" "edge"
+			(at 30.48 45.02 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+					bold
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "edge.kicad_sch"
+			(at 30.48 66.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(pin "LINK_RX" output
+			(at 63.5 50.8 0)
+			(uuid "7719ede7-a56a-5d34-ad88-203e40780ced")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "LINK_TX" input
+			(at 63.5 53.34 0)
+			(uuid "fb0576fe-f8d4-51db-ba43-9fa14cc12b95")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "CART_VCC" output
+			(at 63.5 58.42 0)
+			(uuid "ef3c2803-07b3-5bd5-96fe-13dffc794203")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(instances
+			(project "FujiNet-Pocket-Rev0"
+				(path "/ff394b2b-0001-5468-a47f-d8dd41a97fc7"
+					(page "2")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 124.46 45.72)
+		(size 50.8 20.32)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 255 255 225 1)
+		)
+		(uuid "c7712c0e-cda6-5898-b3a1-77515981b1dc")
+		(property "Sheetname" "esp32s3-sd"
+			(at 124.46 45.02 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+					bold
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "esp32s3-sd.kicad_sch"
+			(at 124.46 66.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(pin "LINK_RX" input
+			(at 124.46 50.8 180)
+			(uuid "7c0fc633-c8d9-538c-9420-5f921b22bf9c")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "LINK_TX" output
+			(at 124.46 53.34 180)
+			(uuid "27fc21f3-e979-52ff-8495-626747867de7")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "S3_EN" bidirectional
+			(at 175.26 50.8 0)
+			(uuid "07519998-f3f5-5879-94fb-ab514c980527")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "S3_TXD" output
+			(at 175.26 53.34 0)
+			(uuid "8bdb50cd-35ad-5915-a7e2-7cf9a24d2bf2")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "S3_RXD" input
+			(at 175.26 55.88 0)
+			(uuid "fbb886ba-dd28-54f6-a3f2-e0f82e90c7a9")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "S3_IO0" bidirectional
+			(at 175.26 58.42 0)
+			(uuid "f2c63b80-6d4f-5c70-8793-346f341d65a0")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(instances
+			(project "FujiNet-Pocket-Rev0"
+				(path "/ff394b2b-0001-5468-a47f-d8dd41a97fc7"
+					(page "3")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 220.98 45.72)
+		(size 45.72 20.32)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 255 255 225 1)
+		)
+		(uuid "eaa17ed8-2afb-5a2a-aa7a-b6de3fe5d03b")
+		(property "Sheetname" "usb-uart"
+			(at 220.98 45.02 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+					bold
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "usb-uart.kicad_sch"
+			(at 220.98 66.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(pin "S3_EN" output
+			(at 220.98 50.8 180)
+			(uuid "6508ea60-9b75-5f94-b09b-62ba2d0e1787")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "S3_TXD" input
+			(at 220.98 53.34 180)
+			(uuid "37b78bc3-881b-537e-922f-b29b6e17564c")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "S3_RXD" output
+			(at 220.98 55.88 180)
+			(uuid "df3fb7b5-49d8-587a-83e4-538c6522c758")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "S3_IO0" output
+			(at 220.98 58.42 180)
+			(uuid "02b6db51-909b-5557-9275-5f1bca62a7ad")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(instances
+			(project "FujiNet-Pocket-Rev0"
+				(path "/ff394b2b-0001-5468-a47f-d8dd41a97fc7"
+					(page "4")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 124.46 96.52)
+		(size 50.8 20.32)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 255 255 225 1)
+		)
+		(uuid "113877c5-6a44-5bff-9a74-179e8fd72159")
+		(property "Sheetname" "power"
+			(at 124.46 95.82 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+					bold
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "power.kicad_sch"
+			(at 124.46 117.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(pin "CART_VCC" input
+			(at 124.46 101.6 180)
+			(uuid "cf862a26-2de5-542b-b4f6-e2d2bdfd19f0")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(instances
+			(project "FujiNet-Pocket-Rev0"
+				(path "/ff394b2b-0001-5468-a47f-d8dd41a97fc7"
+					(page "5")
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 63.5 50.8)
+			(xy 124.46 50.8)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "51c8d485-59c2-5b4a-a373-4bb766ed8d6d")
+	)
+	(wire
+		(pts
+			(xy 63.5 53.34)
+			(xy 124.46 53.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "fc5c41d0-860d-597d-847f-e974bcc8b9b1")
+	)
+	(wire
+		(pts
+			(xy 175.26 50.8)
+			(xy 220.98 50.8)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "da1d8231-c3c8-573e-9cbd-b9a92e46fd4d")
+	)
+	(wire
+		(pts
+			(xy 175.26 53.34)
+			(xy 220.98 53.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9368db7f-c247-5486-b1c3-9727f3ce1847")
+	)
+	(wire
+		(pts
+			(xy 175.26 55.88)
+			(xy 220.98 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1d33e4e4-e3c6-5678-b38d-f2c5434b026b")
+	)
+	(wire
+		(pts
+			(xy 175.26 58.42)
+			(xy 220.98 58.42)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8ef80ef5-5623-5344-8cf2-2fd0b74016e8")
+	)
+	(wire
+		(pts
+			(xy 63.5 58.42)
+			(xy 99.06 58.42)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "49d89e74-507e-5ad9-95f5-881e1928db14")
+	)
+	(wire
+		(pts
+			(xy 99.06 58.42)
+			(xy 99.06 101.6)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f7e3499f-4472-5410-93a1-dce27a29865b")
+	)
+	(wire
+		(pts
+			(xy 99.06 101.6)
+			(xy 124.46 101.6)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "94f5ebf7-a4e3-5a4f-8858-99b4c2550bbe")
+	)
+	(label "LINK_RX"
+		(at 67.31 50.8 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "32363347-7445-5ec9-95d3-da5101ed2709")
+	)
+	(label "LINK_TX"
+		(at 67.31 53.34 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "0dfacc19-ed0a-594f-9c60-df312ad2bedc")
+	)
+	(label "S3_EN"
+		(at 179.07 50.8 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "c98263b1-63e4-5441-b9cd-610333bf5c34")
+	)
+	(label "S3_TXD"
+		(at 179.07 53.34 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "5cd0d37f-6088-5672-b8d5-895c74c32853")
+	)
+	(label "S3_RXD"
+		(at 179.07 55.88 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "668e61a2-8806-543d-b57a-b641cd542d22")
+	)
+	(label "S3_IO0"
+		(at 179.07 58.42 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "f677dcbf-84be-5a60-9f0a-e186ffa972b6")
+	)
+	(label "CART_VCC"
+		(at 67.31 58.42 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "e99252d7-7c93-5eba-b27e-07336a56a6d1")
+	)
+	(text "FujiNet Pocket Rev0 (DRAFT, schematic only).  A FujiNet for the Analogue Pocket's cartridge slot: the openFPGA-7800\ncore serves the 7800 FujiNet mailbox and sends each request as a FujiBus packet in a SLIP frame at 115,200 baud 8N1 on\ncartridge pin 5 (its TX), and listens on pin 31.  The board is the FujiNet half alone: ESP32-S3 (fujinet-firmware's RS232\nbuild on UART1, pin map firmware/pocket.h), microSD, USB-C / CP2102N for flashing, its own LiPo.\nSlot -> two Ioff buffers -> ESP32-S3 -> USB bridge; power: USB charges the cell and runs the board, the cell runs it\notherwise; the 3.3 V buck-boost runs while the Pocket's cart rail or USB is up.  The shell's lower corner must be GBA-shaped\n(the Pocket's voltage switch unpressed) so the slot stays at 3.3 V.\nFujiNet half: FujiNet-7800-Rev0 (fujinet-hardware, CERN-OHL-W-2.0).  Edge geometry: Gekkio GB-CART32K-A (CC-BY-4.0)."
+		(exclude_from_sim no)
+		(at 30.48 139.7 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left top)
+		)
+		(uuid "1483f700-c2d6-587d-b365-4e1893a52869")
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)

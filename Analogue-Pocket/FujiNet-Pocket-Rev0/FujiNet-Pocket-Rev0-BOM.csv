@@ -1,0 +1,33 @@
+References,Qty,Value,Footprint,Manufacturer,MPN,LCSC,DNP,Description
+C1 C2 C4 C8 C9 C14,6,100nF,C_0603_1608Metric,YAGEO,CC0603KRX7R9BB104,C14663,,RX buffer VCC
+C3 C13 C15 C16,4,22uF,C_0805_2012Metric,Samsung Electro-Mechanics,CL21A226MAQNNNE,C45783,,S3 bulk (WiFi TX bursts)
+C5 C7,2,1uF,C_0603_1608Metric,Samsung Electro-Mechanics,CL10A105KB8NNNC,C15849,,EN power-on delay
+C6,1,10uF,C_0603_1608Metric,Samsung Electro-Mechanics,CL10A106KP8NNNC,C19702,,microSD supply
+C10 C11 C12,3,4.7uF,C_0603_1608Metric,Samsung Electro-Mechanics,CL10A475KO8NNNC,C19666,,CP2102N VDD bulk
+D1,1,green,LED_0603_1608Metric,Hubei KENTO Elec,KT-0603G,,,"WiFi LED (IO14, low = on)"
+D2 D6,2,red,LED_0603_1608Metric,Hubei KENTO Elec,KT-0603R,C2286,,"bus activity LED (IO16, low = on)"
+D3 D4 D5,3,ESD5Z5.0T1G,D_SOD-523,onsemi,ESD5Z5.0T1G,C82044,,ESD
+D7,1,SS34,D_SMA,MDD (Microdiode Semiconductor),SS34,C8678,,USB VBUS onto VSYS
+D8,1,BAT54C,SOT-23,Nexperia,"BAT54C,215",C37704,,"PWR_EN = CART_VCC or VBUS, common cathode"
+J2,1,microSD,TF-SMD_TF-015,SOFNG,TF-015,C113206,,"microSD push-push, SPI mode"
+J3,1,USB-C,USB_C_Receptacle_HRO_TYPE-C-31-M-12,Korean Hroparts Elec,TYPE-C-31-M-12,C165948,,charging + S3 programming
+J4,1,LiPo,JST_PH_S2B-PH-SM4-TB_1x02-1MP_P2.00mm_Horizontal,JST,S2B-PH-SM4-TB(LF)(SN),,,"1S LiPo, protected cell: 1 +, 2 -"
+L1,1,1.5uH,L_Sunlord_SWPA4030S,Sunlord,SWPA4030S1R5NT,,,buck-boost inductor (datasheet: 1.5 uH)
+Q1,1,AO3401A,SOT-23,Alpha & Omega Semiconductor,AO3401A,C15127,,"cell onto VSYS without USB: G = VBUS, S = VSYS, D = VBAT"
+R1 R4,2,100R,R_0603_1608Metric,UNI-ROYAL,0603WAF1000T5E,C22775,,link RX: series at the finger
+R2 R3 R17,3,100k,R_0603_1608Metric,UNI-ROYAL,0603WAF1003T5E,C25803,,link RX: defined low with the Pocket off
+R5 R6 R13,3,10k,R_0603_1608Metric,UNI-ROYAL,0603WAF1002T5E,C25804,,EN pull-up
+R7 R8 R15,3,1k,R_0603_1608Metric,UNI-ROYAL,0603WAF1001T5E,C21190,,WiFi LED series
+R9 R10,2,5.1k,R_0603_1608Metric,UNI-ROYAL,0603WAF5101T5E,C23186,,UFP Rd
+R11,1,22k,R_0603_1608Metric,UNI-ROYAL,0603WAF2202T5E,C31850,,VBUS sense divider
+R12,1,47k,R_0603_1608Metric,UNI-ROYAL,0603WAF4702T5E,C25819,,VBUS sense divider
+R14 R16,2,4.7k,R_0603_1608Metric,UNI-ROYAL,0603WAF4701T5E,C23162,,charge current 213 mA (1000 V / R)
+RN1,1,4x10k,R_Array_Convex_4x0603,UNI-ROYAL,4D03WGJ0103T5E,C29718,,SD pull-ups
+SW1,1,S3_RST,SW_SPST_TS-1187A,XKB Connection,TS-1187A-B-A-B,C318884,,ESP32-S3 EN (reset)
+SW2,1,S3_BOOT,SW_SPST_TS-1187A,XKB Connection,TS-1187A-B-A-B,C318884,,ESP32-S3 BOOT (IO0)
+U1 U2,2,74LVC1G34,SOT-23-5,Texas Instruments,SN74LVC1G34DBVR,,,link RX buffer on +3V3 (Pocket TX -> S3 UART1 RX)
+U3,1,ESP32-S3-WROOM-1-N16R8,ESP32-S3-WROOM-1,Espressif,ESP32-S3-WROOM-1-N16R8,C2913202,,"FujiNet core (RS232 build, pocket pin map)"
+U4,1,CP2102N-A02-GQFN28,QFN-28-1EP_5x5mm_P0.5mm_EP3.35x3.35mm,Silicon Labs,CP2102N-A02-GQFN28R,C964632,,USB-UART for S3 flashing/console (self-powered)
+U5,1,UMH3N,SOT-363_SC-70-6,Jiangsu Changjing (JSCJ),UMH3N,C62892,,esptool auto-program (DevKitC-1 style)
+U6,1,MCP73831-2,SOT-23-5,Microchip,MCP73831T-2ACI/OT,,,"1S LiPo charger, 4.20 V, from USB only"
+U7,1,TPS63001,Texas_DRC0010J,Texas Instruments,TPS63001DRCR,,,"3.3 V buck-boost, 1.2 A (buck) / 800 mA from 2.4 V (boost)"
