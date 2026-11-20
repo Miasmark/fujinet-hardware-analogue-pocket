@@ -1,0 +1,10 @@
+(version 1)
+(rule "gnd_solid_under_ics"
+	(condition "A.NetName == 'GND' && (A.memberOfFootprint('U4') || A.memberOfFootprint('U7') || A.memberOfFootprint('J3'))")
+	(constraint zone_connection solid))
+(rule "finger_edge"
+	(condition "A.memberOfFootprint('J1')")
+	(constraint edge_clearance (min 0.5mm)))
+(rule "connectors_at_edge"
+	(condition "A.memberOfFootprint('J3') || A.memberOfFootprint('J2')")
+	(constraint edge_clearance (min 0mm)))

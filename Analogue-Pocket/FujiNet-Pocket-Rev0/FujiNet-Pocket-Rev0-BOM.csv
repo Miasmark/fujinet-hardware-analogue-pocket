@@ -11,7 +11,6 @@ D7,1,SS34,D_SMA,MDD (Microdiode Semiconductor),SS34,C8678,,USB VBUS onto VSYS
 D8,1,BAT54C,SOT-23,Nexperia,"BAT54C,215",C37704,,"PWR_EN = CART_VCC or VBUS, common cathode"
 J2,1,microSD,TF-SMD_TF-015,SOFNG,TF-015,C113206,,"microSD push-push, SPI mode"
 J3,1,USB-C,USB_C_Receptacle_HRO_TYPE-C-31-M-12,Korean Hroparts Elec,TYPE-C-31-M-12,C165948,,charging + S3 programming
-J4,1,LiPo,JST_PH_S2B-PH-SM4-TB_1x02-1MP_P2.00mm_Horizontal,JST,S2B-PH-SM4-TB(LF)(SN),,,"1S LiPo, protected cell: 1 +, 2 -"
 L1,1,1.5uH,L_Sunlord_SWPA4030S,Sunlord,SWPA4030S1R5NT,,,buck-boost inductor (datasheet: 1.5 uH)
 Q1,1,AO3401A,SOT-23,Alpha & Omega Semiconductor,AO3401A,C15127,,"cell onto VSYS without USB: G = VBUS, S = VSYS, D = VBAT"
 R1 R4,2,100R,R_0603_1608Metric,UNI-ROYAL,0603WAF1000T5E,C22775,,link RX: series at the finger

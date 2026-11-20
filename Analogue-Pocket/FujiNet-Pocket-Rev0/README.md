@@ -11,16 +11,24 @@ console-side microcontroller. It is the same for every Pocket core that speaks t
 first is openFPGA-7800 (2.2.7: CONFIG, the network devices and game loading, tested with
 fujinet-pc on the link port). An Intellivision core and a 2600 core are scoped to follow.
 
-**Status (2026-11-20): schematic draft only.** It has not been laid out, built or run.
+**Status (2026-11-20): draft, schematic and board.** It is placed and routed, but has not
+been ordered, built or run, and has not been fitted to a Pocket.
 
 | Check | Result |
 |---|---|
 | ERC (all severities) | 0 errors, 0 warnings |
-| netlist parity (kicad-cli netlist vs `tools/design.py`) | 41 / 41 nets |
+| Netlist parity (kicad-cli netlist vs `tools/design.py`) | 41 / 41 nets |
 | `tools/check_pins.py` (the netlist vs `firmware/pocket.h`, plus the link path) | pass |
-| Layout, shell, fit in a Pocket | not started |
+| DRC, errors, with schematic parity | 0 violations, 0 unconnected, 0 parity |
+| DRC warnings | 6: 3 dangling stitch vias, 2 silk near the edge, 1 hole-to-hole |
+| Shell, fit in a Pocket | not started (`case/README.md`) |
 
-`tools/build_all.sh` regenerates everything. It needs KiCad 10 and Python 3.
+`tools/build_all.sh` regenerates the schematic and the checks; `LAYOUT=1 tools/build_all.sh`
+also regenerates the board and its outputs. It needs:
+- KiCad 10 and Python 3;
+- for the board, KiCad's pcbnew Python module (`PCBNEW_PYTHON`, default `/usr/bin/python3`) and
+  numpy;
+- Freerouting 2.4.1, which needs Java 25 (`JAVA` names the binary).
 - The circuit lives in `tools/design.py`.
 - The sheet drawings live in `tools/sch_layout.py`.
 - The `.kicad_sch` files are output: edit the Python, not them.
@@ -94,9 +102,12 @@ The device powers itself. The Pocket's cart rail has only been seen to supply ab
 ESP32-S3 on WiFi averages more than that and peaks several times higher (openFPGA-7800
 `docs/FUJINET_POCKET_DEVICE.md`, section 5).
 
-- **Cell:** a protected 1S LiPo pouch, for example a 303450 or 403450 (400-600 mAh), on a JST-PH.
+- **Cell:** a protected 1S LiPo pouch up to 30 x 40 x 5 mm, for example a 403040 or 503040
+  (400-600 mAh). It sits on the landing pad on the back (layout below), held by foam tape, with
+  its leads soldered to the pad's + and - pads. There is no connector, so there is no JST-PH
+  polarity to get wrong.
   - The board has no protection circuit of its own: the cell's is relied on.
-  - **Check the cell's polarity: JST-PH cells come wired both ways.**
+  - The cell is bought separately and is not on the BOM.
 - **Charger:** MCP73831-2 (4.20 V), 213 mA (R_PROG 4.7k, about 0.5 C for 400 mAh), from USB
   only, with a charge LED.
 - **Power path** (Microchip AN1149, as the 7800 board's 5 V OR):
@@ -126,25 +137,77 @@ as `include/pinmap/pocket.h` and `build-platforms/platformio-fujinet-pocket.ini`
 
 `pinmap.h` also needs its `#include "pinmap/pocket.h"`. Neither file has been compiled yet.
 
-## Before layout
+## The board
+
+![front](docs/board-top.png) ![back](docs/board-bottom.png)
+
+- **Size and stack:** 51.4 x 82 mm, 1.0 mm thick, 4 layers:
+  - F.Cu: signals and a GND pour;
+  - In1: GND plane;
+  - In2: +3V3 plane;
+  - B.Cu: signals and a GND pour.
+- **The tab:** the GB / GBA tab with its 32 fingers. The insertion corners are 0.9 mm arcs, as a
+  GB cartridge's.
+- **Inside the slot** (below about 31 mm from the insertion edge, an estimate; the F.Fab layer
+  draws the line): only the two link buffers and their parts, over pins 5 and 31, plus the
+  bring-up pads.
+- **Above the Pocket, on the front:**
+  - the ESP32-S3 at the top, its antenna flush with the top edge over its keep-out band (no
+    copper, holes or parts across the board there);
+  - USB-C on the west side and microSD on the east side;
+  - the reset and BOOT buttons and the three LEDs down the west side;
+  - below the module: the charger and power path, the TPS63001, the CP2102N.
+- **The battery's landing pad, on the back:**
+  - a 30 x 40 mm outline with corner marks, for a cell up to 5 mm thick, under the upper board;
+  - a B.Cu rule area over it keeps any part off the back there;
+  - the cell's leads solder to two pads at its west end, marked + and -, by the charger;
+  - nothing else is placed on the back, so assembly is single-sided.
+- **Six M2 holes** (2.2 mm) for the shell, each kept 3 mm clear of parts:
+  - two by the top corners, below the antenna band;
+  - two just above the slot line;
+  - two inside the slot.
+
+  `case/board-anchors.json` and `.scad` carry them for the shell design, with the outline, the
+  ports, buttons, LEDs and the cell. `case/README.md` lists what the shell must respect: the
+  GBA-shaped corner, the antenna, the openings and the cell's room to swell.
+- **Routing:** generated, as for FujiNet-7800-Rev0. The order:
+  1. `tools/gen_pcb.py` places the parts from `tools/placement.py` and fans out the planes. It also
+     lays four things down by hand, locked:
+     - the TPS63001's pins, to its inductor and capacitors as its datasheet shows, and its VIN /
+       VINA loop;
+     - the USB-C D+ / D- crossover (D- under it on B.Cu, through two 0.45 / 0.2 mm vias);
+     - the UART0 escapes from the module to B.Cu;
+     - the GND finger's stub.
+  2. Freerouting routes the rest.
+  3. The 7800 board's finisher closes what is left; stitching vias tie the GND pours to In1.
+- **Outputs** (`tools/export_fab.py`): `exports/`
+  - gerbers and drill;
+  - the front position file;
+  - `FujiNet-Pocket-Rev0.step` (the board with every model and the cell's stand-in, for the
+    shell);
+  - the renders in `docs/`.
+
+## Before ordering boards
 
 1. **Edge:** check the finger face, pin 1 and the board thickness (1.0 mm, as Gekkio's GB
-   boards) against a GB cartridge in a Pocket.
-2. **Shell and outline:** the board is a GB-cart-sized body with a GBA-shaped lower corner, so the
-   Pocket's voltage switch stays unpressed and the slot stays at 3.3 V. A GB/GBC-shaped corner
-   puts the slot at 5 V. The device notes in openFPGA-7800 say to cut it 0.5-1 mm deeper and wider
-   than a GBA cart's.
-   - **Inside the slot:** the edge, the buffers and the enable.
-   - **Above the Pocket:** the module with its antenna at the top edge, clear of the Pocket's
-     back; also the cell, USB-C, microSD and the LEDs.
-   - Print a blank first.
+   boards) against a GB cartridge in a Pocket. Measure where the Pocket's shell top falls on the
+   board (31 mm from the insertion edge is assumed).
+2. **Shell:** print a blank with the GBA-shaped corner first, and check that it seats fully and
+   clears the voltage switch and the shoulder buttons (`case/README.md`).
 3. **Sourcing:** no LCSC code chosen yet for SN74LVC1G34DBVR, MCP73831T-2ACI/OT, TPS63001DRCR,
-   SWPA4030S1R5NT, S2B-PH-SM4-TB and the green LED (`FujiNet-Pocket-Rev0-BOM.csv`).
+   SWPA4030S1R5NT and the green LED (`FujiNet-Pocket-Rev0-BOM.csv`).
 4. **The inductor's saturation current** against the TPS63001's switch current limit (datasheet).
 5. **The microSD card-detect polarity:** it is wired to IO42 and set NC in `pocket.h` until known.
-6. **Compile `pocket.h`** in fujinet-firmware; offer the pin map upstream once a board has run.
-7. **Silkscreen:** the link to github.com/FujiNetWIFI that this repository's notice requires on
-   any product made from these designs.
+6. **The microSD's locating pegs** come through the board under the cell's outline: check they
+   do not stand proud of the back.
+7. **Fab review:**
+   - the 4-layer, 1.0 mm stack;
+   - hard gold on the fingers, with a bevel;
+   - the 0.45 / 0.2 mm vias;
+   - JLCPCB's placement preview (no CPL rotation corrections are made for this board yet).
+8. **Compile `pocket.h`** in fujinet-firmware; offer the pin map upstream once a board has run.
+9. **Silkscreen:** the link to github.com/FujiNetWIFI is on the back, as this repository's notice
+   requires.
 
 ## Files
 
@@ -155,6 +218,15 @@ as `include/pinmap/pocket.h` and `build-platforms/platformio-fujinet-pocket.ini`
 | `tools/gen_sch.py`, `sch_draw.py`, `sexpr.py` | The generator and its checks (FujiNet-7800-Rev0's). |
 | `tools/harvest_symbols.py`, `symcache.sexpr` | The stock symbols embedded in the sheets. |
 | `tools/make_edge_fp.py` | The slot edge footprint. |
+| `tools/make_fp_extra.py` | The LiPo landing pad footprint. |
+| `tools/make_cell_step.py` | The cell's stand-in 3D model (a 40 x 30 x 4 mm box, STEP written by hand). |
+| `tools/placement.py`, `tools/gen_pcb.py` | Where every part goes; the board generator (outline, holes, planes, keep-outs, the pre-routes, the shell anchors). |
+| `tools/fanout.py`, `route.py`, `finish_route.py`, `drc_fix.py`, `tidy_tracks.py`, `stitch_gnd.py`, `check_vias.py`, `fix_silk.py`, `fill_zones.py`, `set_models.py`, `route_board.sh` | Plane fan-out, Freerouting, the finisher and clean-up (FujiNet-7800-Rev0's). |
+| `tools/export_fab.py` | Gerbers, drill, positions, STEP, renders. |
+| `FujiNet-Pocket-Rev0.kicad_pcb` | The board (generated). |
+| `case/` | The shell notes and the board's anchors for it. |
+| `3d/` | The 3D models (FujiNet-7800-Rev0's set, plus the cell's stand-in). |
+| `exports/` | The fab and STEP outputs. |
 | `tools/check_pins.py` | The netlist against `firmware/pocket.h` and the link path. |
 | `tools/bom.py` | `FujiNet-Pocket-Rev0-BOM.csv`. |
 | `firmware/` | The proposed fujinet-firmware pin map and build env. |

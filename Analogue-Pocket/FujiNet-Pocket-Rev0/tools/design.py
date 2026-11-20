@@ -94,8 +94,7 @@ MFR = {'CC0603KRX7R9BB104': 'YAGEO', 'CL10A106KP8NNNC': 'Samsung Electro-Mechani
        'CP2102N-A02-GQFN28R': 'Silicon Labs', 'UMH3N': 'Jiangsu Changjing (JSCJ)',
        'AO3401A': 'Alpha & Omega Semiconductor', 'SS34': 'MDD (Microdiode Semiconductor)',
        'SN74LVC1G34DBVR': 'Texas Instruments', 'MCP73831T-2ACI/OT': 'Microchip',
-       'TPS63001DRCR': 'Texas Instruments', 'SWPA4030S1R5NT': 'Sunlord',
-       'S2B-PH-SM4-TB(LF)(SN)': 'JST'}
+       'TPS63001DRCR': 'Texas Instruments', 'SWPA4030S1R5NT': 'Sunlord'}
 for _v in RES.values():
     MFR[_v[0]] = 'UNI-ROYAL'
 
@@ -257,12 +256,14 @@ add('U', 'Transistor_BJT:UMH3N', 'UMH3N', FP('SOT-363_SC-70-6'),
 
 # =========================================================================
 sheet('power')
-# The cell: a protected 1S LiPo pouch (a 303450 / 403450, 400-600 mAh) on a JST-PH.  Its own
-# protection circuit is relied on; there is none on this board.  CHECK THE CELL'S POLARITY:
-# JST-PH cells come wired both ways.
-add('J', 'Connector_Generic:Conn_01x02', 'LiPo', FP('JST_PH_S2B-PH-SM4-TB_1x02-1MP_P2.00mm_Horizontal'),
-    {1: 'VBAT', 2: 'GND'}, mpn='S2B-PH-SM4-TB(LF)(SN)', lcsc='',
-    desc='1S LiPo, protected cell: 1 +, 2 -', key='J_BAT')
+# The cell: a protected 1S LiPo pouch up to 30 x 40 mm (a 403040 / 503040, 400-600 mAh), taped to
+# the landing pad on the back of the upper board, its leads soldered to the pad's two B.Cu pads:
+# no connector, so no JST-PH polarity to get wrong (cells come wired both ways).  Its own
+# protection circuit is relied on; there is none on this board.  Not a BOM line: the cell is
+# bought separately (README.md).
+add('J', 'Connector_Generic:Conn_01x02', 'LiPo', FP('LiPo_Landing_30x40'), {1: 'VBAT', 2: 'GND'},
+    desc='1S LiPo, protected, <= 30 x 40 x 5 mm: leads to pad 1 (+) and 2 (-) on the back', bom=False,
+    key='J_BAT')
 # Charger: MCP73831-2 (4.20 V), I = 1000 V / R_PROG: 4.7k = 213 mA, about 0.5 C for 400 mAh.
 add('U', 'Battery_Management:MCP73831-2-OT', 'MCP73831-2', FP('SOT-23-5'),
     {1: 'CHG_STAT', 2: 'GND', 3: 'VBAT', 4: 'VBUS', 5: 'CHG_PROG'},

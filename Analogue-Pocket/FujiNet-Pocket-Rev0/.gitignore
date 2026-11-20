@@ -1,0 +1,5 @@
+exports/*.dsn
+exports/*.ses
+exports/freerouting.log
+*.kicad_prl
+FujiNet-Pocket-Rev0-backups/

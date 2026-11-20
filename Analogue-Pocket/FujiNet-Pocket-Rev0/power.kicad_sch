@@ -3502,7 +3502,7 @@
 		(at 170.18 45.72 0)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(dnp no)
 		(uuid "98795a6a-41eb-571b-b547-ae671f3a2c52")
@@ -3524,7 +3524,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "FujiNet-Pocket:JST_PH_S2B-PH-SM4-TB_1x02-1MP_P2.00mm_Horizontal"
+		(property "Footprint" "FujiNet-Pocket:LiPo_Landing_30x40"
 			(at 170.18 45.72 0)
 			(effects
 				(font
@@ -3542,16 +3542,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "1S LiPo, protected cell: 1 +, 2 -"
-			(at 170.18 45.72 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "MPN" "S2B-PH-SM4-TB(LF)(SN)"
+		(property "Description" "1S LiPo, protected, <= 30 x 40 x 5 mm: leads to pad 1 (+) and 2 (-) on the back"
 			(at 170.18 45.72 0)
 			(effects
 				(font
