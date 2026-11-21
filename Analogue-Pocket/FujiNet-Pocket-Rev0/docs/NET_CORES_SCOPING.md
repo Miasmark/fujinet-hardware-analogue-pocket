@@ -91,7 +91,12 @@ the USB keyboard is controller 3 and the mouse is controller 4.
     - The buttons are five bits, `cont4_joy[20:16]`, one per button in HID order, **confirmed**:
       bit 16 left, 17 right, 18 middle, 19 back, 20 forward (held together they combine, e.g.
       the first three = 0x07).
-    - `cont4_joy[31:24]` is the likely wheel (to confirm).
+    - **No separate wheel.** Each wheel click arrives as a report of X = +1 or -1 (raw 0x0100
+      or 0xFFFF in `cont4_joy[15:0]`), exactly like a one-count move left or right;
+      `cont4_joy[31:24]`, `cont4_key[27:16]` and `cont4_trig` don't change. So on this
+      firmware a core can't tell scrolling from slow sideways motion: scrolling must come from
+      the keyboard (Page Up / Page Down, arrows) or a held button.
+    - Y is positive downwards (the pointer follows the mouse with Y added as-is).
     - The counter counts up in its plain order and moves only when the mouse reports.
     - **Not every mouse works.** A Microsoft Comfort Mouse 4500 gave reports and button
       presses but no motion at all: the Dock (its firmware, not the core) doesn't read that
@@ -249,9 +254,10 @@ commands):
 
 ## 5. Open questions
 
-1. **Mouse details:** check controller 4 on hardware with the input monitor core (section 1).
-   The layout is known from the Atari ST core; the sign of the motion, the button order and the
-   wheel are not. (The keyboard's modifier byte is settled: `cont3_key[15:8]`.)
+1. **Mouse: settled** on a Classic IntelliMouse (section 1): byte-swapped X and Y, five
+   buttons, no separate wheel. Still worth trying other mice, since the Dock decodes them
+   itself and a Comfort Mouse 4500 gave no motion. (The keyboard's modifier byte is settled
+   too: `cont3_key[15:8]`.)
 2. **Link rate:** which bauds the RS232 build accepts, and a check at speed through the slot.
 3. **SSH and TLS-over-TCP** in the S3 RS232 build (sections 2 and 3).
 4. **Save-file writes:** what data.json flags a dialling directory or bookmark file needs
