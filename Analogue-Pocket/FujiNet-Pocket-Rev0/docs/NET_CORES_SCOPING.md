@@ -61,9 +61,13 @@ the USB keyboard is controller 3 and the mouse is controller 4.
 - **Keyboard: known.** The Intellivision core already decodes it (`src/fpga/core/intv_input.sv`):
   - it is controller 3 with type 4, `cont3_key[31:28] == 4`;
   - up to six held keys, as HID usage codes: four in `cont3_joy[31:0]`, one per byte, and two in
-    `cont3_trig[15:0]`;
-  - the HID modifier byte (Ctrl, Shift, Alt, GUI, left and right) in `cont3_key[7:0]`, by that
-    core; the Atari ST core puts it in `[15:8]` (below: verify).
+    `cont3_trig[15:0]`. On hardware (the input monitor core, 2026-11-21) the slots don't fill in
+    byte order: the first key held lands in `joy[31:24]`, the next in `joy[7:0]`, then
+    `trig[15:8]`, then `trig[7:0]`. A decoder must scan all six bytes and never rely on their
+    order (the Intellivision core already scans all six);
+  - the HID modifier byte (Ctrl, Shift, Alt, GUI, left and right) in `cont3_key[7:0]`:
+    **confirmed on hardware** (the input monitor core, 2026-11-21). Ctrl, Shift, Alt and GUI
+    light bits 0-3 (left) and 4-7 (right) in the usual HID order.
 
   That core decodes one code per clock in an 8-clock round, after a whole-word toggle handshake
   across the clock domains. Both can be reused as they are. A terminal needs:
@@ -90,11 +94,10 @@ the USB keyboard is controller 3 and the mouse is controller 4.
     The test is to draw the three cont4 words as hex on screen in a test core, then move the mouse,
     press each button and turn the wheel.
   - Phase 1 doesn't need the mouse.
-- **Keyboard modifier byte: the two cores disagree.** The Intellivision core reads the HID modifier
-  byte from `cont3_key[7:0]`; the ST core's doc gives `cont3_key[15:8]`. **Verify** which one is
-  right with the same hex test (press Shift and Ctrl). If `[15:0]` is a report counter on
-  controller 3, as it is on controller 4, then `[15:8]` is more likely right, and the
-  Intellivision core needs a fix.
+- **Keyboard modifier byte: settled.** The Intellivision core reads it from `cont3_key[7:0]` and
+  the ST core's doc gives `cont3_key[15:8]`. The input monitor core
+  (github.com/Miasmark/openfpga-input-monitor) shows `[7:0]` is right, on a Dock with firmware
+  of 2026-11: the Intellivision core needs no fix.
 - **Without a Dock:** an on-screen keyboard, built on the Intellivision core's `intv_osk_draw.sv`
   and `tools/osk.py` layout tool. On the handheld, the D-pad moves the cursor and A types.
   - The ECS layout there is 5 rows. A terminal wants a fuller one (Esc, Tab, Ctrl, arrows).
@@ -232,9 +235,9 @@ commands):
 
 ## 5. Open questions
 
-1. **Mouse details and the keyboard's modifier byte:** log controllers 3 and 4 on hardware
-   (section 1). The layout is known from the Atari ST core; the sign of the motion, the button
-   order and the modifier byte's position are not.
+1. **Mouse details:** check controller 4 on hardware with the input monitor core (section 1).
+   The layout is known from the Atari ST core; the sign of the motion, the button order and the
+   wheel are not. (The keyboard's modifier byte is settled: `cont3_key[7:0]`.)
 2. **Link rate:** which bauds the RS232 build accepts, and a check at speed through the slot.
 3. **SSH and TLS-over-TCP** in the S3 RS232 build (sections 2 and 3).
 4. **Save-file writes:** what data.json flags a dialling directory or bookmark file needs
