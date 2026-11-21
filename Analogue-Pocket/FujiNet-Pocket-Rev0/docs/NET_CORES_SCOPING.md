@@ -83,6 +83,15 @@ the USB keyboard is controller 3 and the mouse is controller 4.
   - **Relative Y motion:** `cont4_trig[15:0]`, 16 bits.
   - **Buttons:** `cont4_joy[18:16]`, three bits.
   - **Report counter:** `cont4_key[15:0]`.
+  - **On hardware** (the input monitor core, a Microsoft Classic IntelliMouse, 2026-11-21):
+    - X and Y are signed per-report counts with their **bytes swapped**: the low byte is in bits
+      [15:8], so 0x0100 is +1 and 0xFBFF is -5. (The report's bytes are packed from the top of
+      each word, as the keyboard's are; the ST core's notes call this "little-endian".) Read
+      them as-is and each count jumps by 256.
+    - The buttons are five bits, `cont4_joy[20:16]` (five-button mouse; the order to confirm,
+      HID's being left, right, middle, back, forward).
+    - `cont4_joy[31:24]` is the likely wheel (to confirm).
+    - The counter counts up in its plain order and moves only when the mouse reports.
   - The ST core turns the motion into PS/2 IntelliMouse packets. Its README calls the Dock
     keyboard and mouse only lightly tested on hardware.
   - **Not stated there, so verify on hardware:**
