@@ -148,7 +148,8 @@ core) and modem users share the one firmware. Two quirks a terminal must
 handle: in the command state each burst of bytes (ended by a 100 ms gap) is
 one whole command, so the command line has to go out in one piece; and the
 modem prints nothing back for commands, only `CONNECT` once a dial succeeds.
-NetTerm 0.2.0's Mode FujiNet Modem does both.
+NetTerm 0.2.0's Mode FujiNet Modem does both. It reached a Telnet BBS on a Pocket through fujinet-pc
+(2026-11-21), on the same firmware the cart runs.
 
 **Goal:** a terminal for BBSs, MUDs and shells, from the Pocket or the Dock.
 
