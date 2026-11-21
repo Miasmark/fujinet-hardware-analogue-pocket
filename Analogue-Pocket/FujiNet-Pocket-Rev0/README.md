@@ -139,6 +139,11 @@ as `include/pinmap/pocket.h` and `build-platforms/platformio-fujinet-pocket.ini`
 
 `pinmap.h` also needs its `#include "pinmap/pocket.h"`. Neither file has been compiled yet.
 
+
+**It is also a modem.** The stock RS232 firmware passes any bytes outside
+FujiBus frames to FujiNet's Hayes-style modem: a terminal core on the cart's
+pins (NetTerm, Mode FujiNet Modem) dials Telnet BBSs with `ATDT host:port`.
+See `docs/NET_CORES_SCOPING.md`, section 2.
 ## The board
 
 ![front](docs/board-top.png) ![back](docs/board-bottom.png)

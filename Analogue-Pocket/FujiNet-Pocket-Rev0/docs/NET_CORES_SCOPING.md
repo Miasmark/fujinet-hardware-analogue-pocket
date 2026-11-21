@@ -138,6 +138,18 @@ every core using the link port: `core.json`'s `cartridge_adapter` must be 0,
 or the link port's SO doesn't drive (its translators seem to share the
 cartridge port's supply).
 
+**The cart is also a modem, with no extra work.** FujiNet's RS232 firmware
+(the build this cart runs) hands any bytes that arrive outside FujiBus
+frames to its Hayes-style modem (fujinet-firmware `lib/bus/rs232/rs232.cpp`,
+`lib/device/rs232/modem.cpp`): `ATDT host:port` opens a Telnet connection,
+and from `CONNECT` on the bytes pass straight through. So any terminal core
+on the cart's serial pins reaches Telnet BBSs, and FujiBus users (the 7800
+core) and modem users share the one firmware. Two quirks a terminal must
+handle: in the command state each burst of bytes (ended by a 100 ms gap) is
+one whole command, so the command line has to go out in one piece; and the
+modem prints nothing back for commands, only `CONNECT` once a dial succeeds.
+NetTerm 0.2.0's Mode FujiNet Modem does both.
+
 **Goal:** a terminal for BBSs, MUDs and shells, from the Pocket or the Dock.
 
 **Scope:**
