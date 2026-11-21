@@ -131,6 +131,13 @@ the USB keyboard is controller 3 and the mouse is controller 4.
 
 ## 2. Phase 1: net terminal core
 
+**Started:** github.com/Miasmark/openfpga-netterm. Milestone 1, a plain serial
+terminal on the link port or the cartridge slot, works on a Pocket with a PC
+terminal (0.1.4, 2026-11-21). FujiNet mode is its milestone 2. A lesson for
+every core using the link port: `core.json`'s `cartridge_adapter` must be 0,
+or the link port's SO doesn't drive (its translators seem to share the
+cartridge port's supply).
+
 **Goal:** a terminal for BBSs, MUDs and shells, from the Pocket or the Dock.
 
 **Scope:**
