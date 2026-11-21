@@ -88,8 +88,9 @@ the USB keyboard is controller 3 and the mouse is controller 4.
       [15:8], so 0x0100 is +1 and 0xFBFF is -5. (The report's bytes are packed from the top of
       each word, as the keyboard's are; the ST core's notes call this "little-endian".) Read
       them as-is and each count jumps by 256.
-    - The buttons are five bits, `cont4_joy[20:16]` (five-button mouse; the order to confirm,
-      HID's being left, right, middle, back, forward).
+    - The buttons are five bits, `cont4_joy[20:16]`, one per button in HID order, **confirmed**:
+      bit 16 left, 17 right, 18 middle, 19 back, 20 forward (held together they combine, e.g.
+      the first three = 0x07).
     - `cont4_joy[31:24]` is the likely wheel (to confirm).
     - The counter counts up in its plain order and moves only when the mouse reports.
     - **Not every mouse works.** A Microsoft Comfort Mouse 4500 gave reports and button
