@@ -92,6 +92,10 @@ the USB keyboard is controller 3 and the mouse is controller 4.
       HID's being left, right, middle, back, forward).
     - `cont4_joy[31:24]` is the likely wheel (to confirm).
     - The counter counts up in its plain order and moves only when the mouse reports.
+    - **Not every mouse works.** A Microsoft Comfort Mouse 4500 gave reports and button
+      presses but no motion at all: the Dock (its firmware, not the core) doesn't read that
+      mouse's motion. A network core should say which mice are known to work, and offer the
+      keyboard (arrow keys) as the fallback pointer.
   - The ST core turns the motion into PS/2 IntelliMouse packets. Its README calls the Dock
     keyboard and mouse only lightly tested on hardware.
   - **Not stated there, so verify on hardware:**
